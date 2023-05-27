@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from pylebedev import PyLebedev
 import numpy as np
 from .gto import GTO
 
 class Quadrature:
     def __init__(self):
-        pass
+        try:
+            from pylebedev import PyLebedev
+            self.leblib = PyLebedev()
+        except ImportError:
+            raise Exception('PyLebedev package is not installed.')
 
     def quad_overlap(self, gto1, gto2, radial_points=32, lebedev_order=31):
         """
@@ -74,8 +77,7 @@ class Quadrature:
             / (np.sqrt(1 - x**2) * (1 - x)**2)
 
         # get Lebedev points
-        leblib = PyLebedev()
-        p,wl = leblib.get_points_and_weights(lebedev_order)
+        p,wl = self.leblib.get_points_and_weights(lebedev_order)
 
         # construct full grid
         gridpts = np.outer(r, p).reshape((-1,3))

@@ -1,12 +1,11 @@
 import unittest
-import numpy as np
 import sys
 import os
 
 # add a reference to load the PPMIL library
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from ppmil import Molecule, PPMIL, CGF
+from ppmil import PPMIL, CGF
 
 class TestExceptions(unittest.TestCase):
 
