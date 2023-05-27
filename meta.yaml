@@ -35,7 +35,7 @@ test:
   source_files:
     - tests/*.py
   commands:
-    - nosetests tests --exclude="testquadrature.py"
+    - nosetests tests --exclude="test_quadrature.py"
 
 about:
   home: https://github.com/ifilot/pylebedev
