@@ -18,7 +18,7 @@ class GTO:
         """
         self.c = c
         self.alpha = alpha
-        self.p = np.array(p, dtype=np.float)
+        self.p = np.array(p, dtype=np.float64)
         self.o = np.array(o, dtype=int)
         self.norm = self.__calculate_norm()
         
