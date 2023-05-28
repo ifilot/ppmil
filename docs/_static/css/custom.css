@@ -1,0 +1,11 @@
+.tight-table td {
+    white-space: normal !important;
+}
+
+.wy-side-nav-search {
+    background: #d18c24;
+}
+
+.icon.icon-home {
+    color: white;
+}
