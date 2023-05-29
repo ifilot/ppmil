@@ -7,6 +7,10 @@ import importlib.util
 # add a reference to load the PPMIL library
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+pylebedev_spec = importlib.util.find_spec('pylebedev')
+if pylebedev_spec is None:
+    sys.exit(0)
+
 from ppmil import Molecule, PPMIL, Quadrature
 
 class TestQuadrature(unittest.TestCase):
@@ -63,7 +67,4 @@ class TestQuadrature(unittest.TestCase):
 
 # only execute this script if PyLebedev is installed
 if __name__ == '__main__':
-    pylebedev_spec = importlib.util.find_spec('pylebedev')
-    print(pylebedev_spec)
-    if pylebedev_spec is not None:
-        unittest.main()
+    unittest.main()
