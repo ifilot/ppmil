@@ -9,7 +9,11 @@ class Quadrature:
             from pylebedev import PyLebedev
             self.leblib = PyLebedev()
         except ImportError:
-            raise Exception('PyLebedev package is not installed.')
+            raise Exception(
+                "PyLebedev package is not installed. "
+                "Please install the PyLebedev package to make use of the"
+                " Quadrature class. See: https://ppmil.imc-tue.nl/installation.html."
+            )
 
     def quad_overlap(self, gto1, gto2, radial_points=32, lebedev_order=31):
         """

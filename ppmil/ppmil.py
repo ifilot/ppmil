@@ -1,12 +1,18 @@
 import numpy as np
 import scipy
-import os
 from .cgf import CGF
 from .gto import GTO
+import importlib.util
+import warnings
 
 class PPMIL:
     def __init__(self):
-        pass
+        pylebedev_spec = importlib.util.find_spec('pylebedev')
+        if pylebedev_spec is None:
+            warnings.warn(
+                "Some functionality of PPMIL depends on PyLebedev. "
+                "Please install PyLebedev. See: https://ppmil.imc-tue.nl/installation.html."
+            )
     
     def overlap(self, cgf1, cgf2):
         """

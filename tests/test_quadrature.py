@@ -2,9 +2,16 @@ import unittest
 import numpy as np
 import sys
 import os
+import importlib.util
 
 # add a reference to load the PPMIL library
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+# only execute this script if PyLebedev is installed, note that this guard
+# needs to be executed *before* the Quadrature package isimported from ppmil
+pylebedev_spec = importlib.util.find_spec('pylebedev')
+if pylebedev_spec is None:
+    sys.exit(0)
 
 from ppmil import Molecule, PPMIL, Quadrature
 
