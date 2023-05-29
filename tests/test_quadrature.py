@@ -64,5 +64,6 @@ class TestQuadrature(unittest.TestCase):
 # only execute this script if PyLebedev is installed
 if __name__ == '__main__':
     pylebedev_spec = importlib.util.find_spec('pylebedev')
+    print(pylebedev_spec)
     if pylebedev_spec is not None:
         unittest.main()
