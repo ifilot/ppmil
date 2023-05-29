@@ -1,6 +1,6 @@
 package:
   name: "ppmil"
-  version: "0.1.0"
+  version: "0.1.1"
 
 source:
   path: .
@@ -36,7 +36,7 @@ test:
     - tests/*.py
     - tests/data/*
   commands:
-    - nosetests tests --exclude="test_quadrature.py"
+    - nosetests tests
 
 about:
   home: https://github.com/ifilot/pylebedev

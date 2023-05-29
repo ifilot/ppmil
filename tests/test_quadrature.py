@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import sys
 import os
+import importlib.util
 
 # add a reference to load the PPMIL library
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -60,5 +61,8 @@ class TestQuadrature(unittest.TestCase):
         
                 np.testing.assert_almost_equal(dipole_quad, dipole, 8)
 
+# only execute this script if PyLebedev is installed
 if __name__ == '__main__':
-    unittest.main()
+    pylebedev_spec = importlib.util.find_spec('pylebedev')
+    if pylebedev_spec is not None:
+        unittest.main()
