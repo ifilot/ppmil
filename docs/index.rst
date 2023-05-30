@@ -35,6 +35,7 @@ requests are ideally submitted via the `github issue tracker
    :caption: Contents:
 
    installation
+   background
    community_guidelines
 
 Indices and tables
