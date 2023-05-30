@@ -46,7 +46,7 @@ jobs:
       uses: docker/metadata-action@v4
       with:
         images: |
-          ifilot/ppmil-docs-nginx
+          ghcr.io/ifilot/ppmil-docs-nginx
     
     - name: Log in to the Container registry
       uses: docker/login-action@v2
