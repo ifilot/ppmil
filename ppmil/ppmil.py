@@ -2,8 +2,10 @@ import numpy as np
 import scipy
 from .cgf import CGF
 from .gto import GTO
+from .gamma import Fgamma
 import importlib.util
 import warnings
+from scipy.special import factorial, comb
 
 class PPMIL:
     def __init__(self):
@@ -13,6 +15,10 @@ class PPMIL:
                 "Some functionality of PPMIL depends on PyLebedev. "
                 "Please install PyLebedev. See: https://ppmil.imc-tue.nl/installation.html."
             )
+    
+    #
+    # CGF INTEGRALS
+    #
     
     def overlap(self, cgf1, cgf2):
         """
@@ -52,6 +58,60 @@ class PPMIL:
                      self.kinetic_gto(gto1, gto2)
                  s += t
         return s
+    
+    def dipole(self, cgf1, cgf2, cc, cref):
+        """
+        Calculate 1D-dipole integral between two contracted Gaussian functions
+        
+        cc:   cartesian direction (0-2)
+        cref: reference position (scalar)
+        """
+        # verify that variables are CGFS
+        if not isinstance(cgf1, CGF):
+            raise TypeError('Argument cgf1 must be of CGF type')
+        if not isinstance(cgf2, CGF):
+            raise TypeError('Argument cgf2 must be of CGF type')
+
+        d = 0.0
+        for gto1 in cgf1.gtos:
+            for gto2 in cgf2.gtos:
+                 t = gto1.c * gto2.c * \
+                     gto1.norm * gto2.norm * \
+                     self.__dipole(gto1.p, gto2.p, 
+                                   gto1.alpha, gto2.alpha,
+                                   gto1.o, gto2.o,
+                                   cc, cref)
+                 #print(gto1.c, gto2.c, gto1.alpha, gto2.alpha,t)
+                 d += t
+        return d
+    
+    def nuclear(self, cgf1, cgf2, nucleus, charge):
+        """
+        Calculate 1D-dipole integral between two contracted Gaussian functions
+        
+        cgf1: Contracted Gaussian Function 1
+        cgf2: Contracted Gaussian Function 1
+        nucleus: nucleus position
+        charge: nucleus charge
+        """
+        # verify that variables are CGFS
+        if not isinstance(cgf1, CGF):
+            raise TypeError('Argument cgf1 must be of CGF type')
+        if not isinstance(cgf2, CGF):
+            raise TypeError('Argument cgf2 must be of CGF type')
+
+        v = 0.0
+        for gto1 in cgf1.gtos:
+            for gto2 in cgf2.gtos:
+                 t = gto1.c * gto2.c * \
+                     gto1.norm * gto2.norm * \
+                     self.nuclear_gto(gto1, gto2, nucleus)
+                 v += t
+        return float(charge) * v
+    
+    #
+    # AUXILIARY FUNCTIONS
+    #
     
     def overlap_gto(self, gto1, gto2):
         """
@@ -131,31 +191,13 @@ class PPMIL:
             
         return t0 + gto1.norm * gto2.norm * (t1 + t2)
     
-    def dipole(self, cgf1, cgf2, cc, cref):
+    def nuclear_gto(self, gto1, gto2, nucleus):
         """
-        Calculate 1D-dipole integral between two contracted Gaussian functions
-        
-        cc:   cartesian direction (0-2)
-        cref: reference position (scalar)
+        Calculate nuclear attraction integral for two GTOs
         """
-        # verify that variables are CGFS
-        if not isinstance(cgf1, CGF):
-            raise TypeError('Argument cgf1 must be of CGF type')
-        if not isinstance(cgf2, CGF):
-            raise TypeError('Argument cgf2 must be of CGF type')
-
-        s = 0.0
-        for gto1 in cgf1.gtos:
-            for gto2 in cgf2.gtos:
-                 t = gto1.c * gto2.c * \
-                     gto1.norm * gto2.norm * \
-                     self.__dipole(gto1.p, gto2.p, 
-                                   gto1.alpha, gto2.alpha,
-                                   gto1.o, gto2.o,
-                                   cc, cref)
-                 #print(gto1.c, gto2.c, gto1.alpha, gto2.alpha,t)
-                 s += t
-        return s
+        return self.__nuclear(gto1.p, gto1.o, gto1.alpha,
+                              gto2.p, gto2.o, gto2.alpha,
+                              nucleus)
     
     def __dipole(self, p1, p2, alpha1, alpha2, o1, o2, cc, cref):
         """
@@ -194,6 +236,66 @@ class PPMIL:
                                    p[cc] - p2[cc], gamma)
         
         return pre * (np.product(wd) + (p2[cc] - cref) * np.product(w))
+    
+    def __nuclear(self, a, o1, alpha1, b, o2, alpha2, c):
+        """
+        Calculate nuclear term
+        
+        a:      position of gto1
+        o1:     orders of gto1
+        alpha1: exponent of gto1
+        b:      position of gto2
+        o2:     orders of gto2
+        alpha2: exponent of gto2
+        c:      position of nucleus
+        """
+        gamma = alpha1 + alpha2
+        p = self.__gaussian_product_center(alpha1, a, alpha2, b)
+        rab2 = np.sum(np.power(a-b,2))
+        rcp2 = np.sum(np.power(c-p,2))
+        
+        ax = self.__A_array(o1[0], o2[0], p[0] - a[0], p[0] - b[0], p[0] - c[0], gamma)
+        ay = self.__A_array(o1[1], o2[1], p[1] - a[1], p[1] - b[1], p[1] - c[1], gamma)
+        az = self.__A_array(o1[2], o2[2], p[2] - a[2], p[2] - b[2], p[2] - c[2], gamma)
+        
+        s = 0.0
+        
+        for i in range(o1[0] + o2[0] + 1):
+            for j in range(o1[1] + o2[1] + 1):
+                for k in range(o1[2] + o2[2] + 1):
+                    s += ax[i] * ay[j] * az[k] * Fgamma(i+j+k,rcp2*gamma)
+       
+        return -2.0 * np.pi / gamma * np.exp(-alpha1*alpha2*rab2/gamma) * s
+       
+    def __A_array(self, l1, l2, pa, pb, cp, g):
+        imax = l1 + l2 +1
+        arr = np.zeros(imax)
+        
+        for i in range(imax):
+            for r in range(i//2+1):
+                for u in range((i-2*r)//2+1):
+                    iI = i - 2*r - u
+                    arr[iI] += self.__A_term(i, r, u, l1, l2, pa, pb, cp, g)
+        
+        return arr
+                    
+    def __A_term(self, i, r, u, l1, l2, pax, pbx, cpx, gamma):
+        return (-1)**i * self.__binomial_prefactor(i, l1, l2, pax, pbx) * \
+               (-1)**u * factorial(i) * np.power(cpx,i - 2*r - 2*u) * \
+               np.power(0.25/gamma,r+u) / factorial(r) / factorial(u) / \
+               factorial(i - 2*r - 2*u)
+    
+    def __binomial_prefactor(self, s, ia, ib, xpa, xpb):
+        s = 0.0
+        
+        for t in range(s+1):
+            if ((s-ia) <= t) and (t <= ib):
+                s += comb(ia, s-t) * \
+                     comb(ib,t) * \
+                     np.power(xpa,ia - s + t) * \
+                     np.power(xpb, ib - t)
+        
+        return s
     
     def __overlap_3d(self, p1, p2, alpha1, alpha2, o1, o2):
         """
