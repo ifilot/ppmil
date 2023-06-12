@@ -342,4 +342,72 @@ class PPMIL:
                       np.power(xpa, ia-s+t) * np.power(xpb, ib-t)
         
         return sm
+    
+    #
+    # DERIVATIVE FUNCTIONS
+    #
+    
+    def overlap_deriv(self, cgf1, cgf2, nucleus, coord):
+        """
+        Calculate overlap integral between two contracted Gaussian functions
+        """
+        # verify that variables are CGFS
+        if not isinstance(cgf1, CGF):
+            raise TypeError('Argument cgf1 must be of CGF type')
+        if not isinstance(cgf2, CGF):
+            raise TypeError('Argument cgf2 must be of CGF type')
         
+        # early exit if the CGF resides on the nucleus
+        cgf1_nuc = np.linalg.norm(cgf1.p - nucleus) < 1e-3
+        cgf2_nuc = np.linalg.norm(cgf2.p - nucleus) < 1e-3
+
+        
+        # if both atoms are on the same nucleus or if neither atom is on
+        # the nucleus, then the result for the overlap derivatives will
+        # be zero
+        if cgf1_nuc == cgf2_nuc:
+            return 0.0
+        
+        s = 0.0
+
+        for gto1 in cgf1.gtos:
+            for gto2 in cgf2.gtos:
+                if not cgf1_nuc:
+                    t1 = 0
+                else:
+                     t1 = self.__overlap_deriv_gto(gto1, gto2, coord)
+                if not cgf2_nuc:
+                    t2 = 0
+                else:
+                    t2 = self.__overlap_deriv_gto(gto2, gto1, coord)
+
+                s += gto1.c * gto2.c * \
+                     gto1.norm * gto2.norm * (t1 + t2)
+        return s
+    
+    def __overlap_deriv_gto(self, gto1, gto2, coord):
+        
+        orders = gto1.o.copy()
+        
+        if gto1.o[coord] != 0:
+            orders[coord] += 1
+            tplus = self.__overlap_3d(gto1.p, gto2.p, 
+                                      gto1.alpha, gto2.alpha, 
+                                      orders, gto2.o)
+            orders[coord] -= 2
+            
+            tmin = self.__overlap_3d(gto1.p, gto2.p, 
+                                     gto1.alpha, gto2.alpha, 
+                                     orders, gto2.o)
+            
+            orders[coord] += 1 # recover
+            
+            return 2.0 * gto1.alpha * tplus - orders[coord] * tmin
+        
+        else: # s-type
+            orders[coord] += 1
+            t = self.__overlap_3d(gto1.p, gto2.p, 
+                                  gto1.alpha, gto2.alpha, 
+                                  orders, gto2.o)
+            
+            return 2.0 * gto1.alpha * t
