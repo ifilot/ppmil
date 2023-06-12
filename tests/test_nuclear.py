@@ -21,8 +21,6 @@ class TestNuclear(unittest.TestCase):
 
         # test GTO
         gto1 = GTO(0.154329, 3.425251, [0.0, 0.0, 0.0], [0, 0, 0])
-        gto2 = GTO(0.535328, 0.623914, [0.0, 0.0, 0.0], [0, 0, 0])
-        gto3 = GTO(0.444635, 0.168855, [0.0, 0.0, 0.0], [0, 0, 0])
 
         nuclear = integrator.nuclear_gto(gto1, gto1, [0.0, 0.0, 0.0])
         result = -0.9171861107748928
@@ -35,6 +33,7 @@ class TestNuclear(unittest.TestCase):
     def test_cgf_nuclear(self):
         """
         Test nuclear attraction integrals for contracted Gaussians
+        for the H2 molecule
 
         V^{(c)}_ij = <cgf_i | -Zc / |r-Rc| | cgf_j>
         """
@@ -67,6 +66,32 @@ class TestNuclear(unittest.TestCase):
         np.testing.assert_almost_equal(V2[0,0], V22, 4)
         np.testing.assert_almost_equal(V2[1,1], V11, 4)
         np.testing.assert_almost_equal(V2[0,1], V12, 4)
+
+    def test_kinetic_h2o(self):
+        """
+        Test nuclear attraction integrals for contracted Gaussians
+        for the H2O molecule
+
+        V^{(c)}_ij = <cgf_i | -Zc / |r-Rc| | cgf_j>
+        
+        """
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
+        h2o = Molecule(xyzfile=fname)
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
+        cgfs, nuclei = h2o.build_basis('sto3g', fname)
+        N = len(cgfs) # basis set size
+        
+        integrator = PPMIL()
+        V = np.zeros((N,N))
+        for i in range(N):
+            for j in range(i,N):
+                V[i,j] = V[j,i] = integrator.nuclear(cgfs[i], cgfs[j], 
+                                                     nuclei[0][0], nuclei[0][1])
+        
+        # test overlap integrals
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'nuclear_h2o.txt')
+        exact = np.loadtxt(fname)
+        np.testing.assert_almost_equal(V, exact, 4)    
 
 if __name__ == '__main__':
     unittest.main()
