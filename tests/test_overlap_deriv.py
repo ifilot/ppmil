@@ -64,8 +64,8 @@ class TestOverlapDeriv(unittest.TestCase):
         cgfs, nuclei = mol.build_basis('sto3g', basisfile)
 
         # load results from file
-        vals = np.loadtxt('data/overlap_deriv_h2o.txt')
-        vals = vals.reshape((len(cgfs), len(cgfs), 3, 3))
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'overlap_deriv_h2o.txt')
+        vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), 3, 3))
         for i in range(0, len(cgfs)): # loop over 
             for j in range(0, len(cgfs)):
                 for k in range(0,3):
