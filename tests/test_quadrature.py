@@ -11,7 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 # needs to be executed *before* the Quadrature package isimported from ppmil
 pylebedev_spec = importlib.util.find_spec('pylebedev')
 if pylebedev_spec is None:
-    sys.exit(0)
+    os._exit(1)
 
 from ppmil import Molecule, PPMIL, Quadrature
 
