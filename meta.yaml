@@ -32,11 +32,11 @@ test:
     - scipy
     - setuptools
     - pytest
+    - ifilot::pylebedev
   source_files:
     - tests/*.py
     - tests/data/*
   commands:
-    - conda install -c ifilot pylebedev
     - pytest tests/*
 
 about:
