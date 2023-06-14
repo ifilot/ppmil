@@ -35,9 +35,7 @@ class PPMIL:
             for gto2 in cgf2.gtos:
                  t = gto1.c * gto2.c * \
                      gto1.norm * gto2.norm * \
-                     self.__overlap_3d(gto1.p, gto2.p, 
-                                       gto1.alpha, gto2.alpha,
-                                       gto1.o, gto2.o)
+                     self.overlap_gto(gto1, gto2)
                  s += t
         return s
     
@@ -55,6 +53,7 @@ class PPMIL:
         for gto1 in cgf1.gtos:
             for gto2 in cgf2.gtos:
                  t = gto1.c * gto2.c * \
+                     gto1.norm * gto2.norm * \
                      self.kinetic_gto(gto1, gto2)
                  s += t
         return s
@@ -81,7 +80,6 @@ class PPMIL:
                                    gto1.alpha, gto2.alpha,
                                    gto1.o, gto2.o,
                                    cc, cref)
-                 #print(gto1.c, gto2.c, gto1.alpha, gto2.alpha,t)
                  d += t
         return d
     
@@ -151,8 +149,7 @@ class PPMIL:
         if not isinstance(gto2, GTO):
             raise TypeError('Argument gto2 must be of GTO type')
 
-        return gto1.norm * gto2.norm * \
-               self.__overlap_3d(gto1.p, gto2.p, 
+        return self.__overlap_3d(gto1.p, gto2.p, 
                gto1.alpha, gto2.alpha, 
                gto1.o, gto2.o)
     
@@ -217,7 +214,7 @@ class PPMIL:
                                     ])
                           )
             
-        return t0 + gto1.norm * gto2.norm * (t1 + t2)
+        return t0 + t1 + t2
     
     def nuclear_gto(self, gto1, gto2, nucleus):
         """
@@ -459,11 +456,12 @@ class PPMIL:
         for gto1 in cgf1.gtos:
             for gto2 in cgf2.gtos:
                 if not cgf1_nuc:
-                    t1 = 0
+                    t1 = 0.0
                 else:
-                     t1 = self.__overlap_deriv_gto(gto1, gto2, coord)
+                    t1 = self.__overlap_deriv_gto(gto1, gto2, coord)
+
                 if not cgf2_nuc:
-                    t2 = 0
+                    t2 = 0.0
                 else:
                     t2 = self.__overlap_deriv_gto(gto2, gto1, coord)
 
@@ -471,29 +469,94 @@ class PPMIL:
                      gto1.norm * gto2.norm * (t1 + t2)
         return s
     
+    def kinetic_deriv(self, cgf1, cgf2, nucleus, coord):
+        """
+        Calculate overlap integral between two contracted Gaussian functions
+        """
+        # verify that variables are CGFS
+        if not isinstance(cgf1, CGF):
+            raise TypeError('Argument cgf1 must be of CGF type')
+        if not isinstance(cgf2, CGF):
+            raise TypeError('Argument cgf2 must be of CGF type')
+        
+        # early exit if the CGF resides on the nucleus
+        cgf1_nuc = np.linalg.norm(cgf1.p - nucleus) < 1e-3
+        cgf2_nuc = np.linalg.norm(cgf2.p - nucleus) < 1e-3
+
+        
+        # if both atoms are on the same nucleus or if neither atom is on
+        # the nucleus, then the result for the overlap derivatives will
+        # be zero
+        if cgf1_nuc == cgf2_nuc:
+            return 0.0
+        
+        s = 0.0
+
+        for gto1 in cgf1.gtos:
+            for gto2 in cgf2.gtos:
+                if not cgf1_nuc:
+                    t1 = 0.0
+                else:
+                    t1 = self.__kinetic_deriv_gto(gto1, gto2, coord)
+
+                if not cgf2_nuc:
+                    t2 = 0.0
+                else:
+                    t2 = self.__kinetic_deriv_gto(gto2, gto1, coord)
+
+                s += gto1.c * gto2.c * \
+                     gto1.norm * gto2.norm * (t1 + t2)
+        return s
+    
     def __overlap_deriv_gto(self, gto1, gto2, coord):
-        
-        orders = gto1.o.copy()
-        
+        """
+        Overlap geometric derivative for two GTOs
+        """
         if gto1.o[coord] != 0:
-            orders[coord] += 1
+            gto1.o[coord] += 1 # calculate l+1 term
             tplus = self.__overlap_3d(gto1.p, gto2.p, 
                                       gto1.alpha, gto2.alpha, 
-                                      orders, gto2.o)
-            orders[coord] -= 2
+                                      gto1.o, gto2.o)
+            gto1.o[coord] -= 2 # calculate l-1 term
             
             tmin = self.__overlap_3d(gto1.p, gto2.p, 
                                      gto1.alpha, gto2.alpha, 
-                                     orders, gto2.o)
+                                     gto1.o, gto2.o)
             
-            orders[coord] += 1 # recover
+            gto1.o[coord] += 1 # recover
             
-            return 2.0 * gto1.alpha * tplus - orders[coord] * tmin
+            return 2.0 * gto1.alpha * tplus - gto1.o[coord] * tmin
         
         else: # s-type
-            orders[coord] += 1
+            gto1.o[coord] += 1
             t = self.__overlap_3d(gto1.p, gto2.p, 
                                   gto1.alpha, gto2.alpha, 
-                                  orders, gto2.o)
+                                  gto1.o, gto2.o)
+            
+            gto1.o[coord] -= 1 # recover terms
             
             return 2.0 * gto1.alpha * t
+        
+    def __kinetic_deriv_gto(self, gto1, gto2, coord):
+        """
+        Kinetic geometric derivative for two GTOs
+        """
+        if gto1.o[coord] != 0:
+            gto1.o[coord] += 1 # calculate l+1 term
+            tplus = self.kinetic_gto(gto1, gto2)
+
+            gto1.o[coord] -= 2 # calculate l-1 term
+            tmin = self.kinetic_gto(gto1, gto2)
+            
+            gto1.o[coord] += 1 # recover terms
+            
+            return 2.0 * gto1.alpha * tplus - gto1.o[coord] * tmin
+        
+        else: # s-type
+            gto1.o[coord] += 1 # calculate l+1 term
+            t = self.kinetic_gto(gto1, gto2)
+
+            gto1.o[coord] -= 1 # recover terms
+            
+            return 2.0 * gto1.alpha * t
+    

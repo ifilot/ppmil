@@ -14,7 +14,7 @@ compiled libraries.
 ## Progress
 
 Note that this project is still under development. Currently, the following
-features are implemented
+molecular integrals are implemented:
 
 - [x] Overlap integrals
 - [x] Kinetic integrals
@@ -22,7 +22,7 @@ features are implemented
 - [x] Dipole integrals
 - [x] Two-electron integrals
 
-And also the following geometric derivaties
+And also the following geometric derivatives:
 
 - [x] Overlap derivatives
 - [ ] Kinetic derivatives
