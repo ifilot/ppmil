@@ -58,6 +58,34 @@ class TestRepulsion(unittest.TestCase):
         # test similarity between two-electron integrals
         np.testing.assert_almost_equal(T1222, T1112, 4)
         np.testing.assert_almost_equal(T1122, T2211, 4)
+        
+    def test_repulsion_h2o(self):
+        """
+        Test two-electron integrals for contracted Gaussians
+
+        (ij|kl) = <cgf_i cgf_j | r_ij | cgf_k cgf_l>
+        """
+
+        # construct integrator object
+        integrator = PPMIL()
+
+        # build hydrogen molecule
+        mol = Molecule("H2O")
+        mol.add_atom('H', 0.00000, -0.07579, 0.00000)
+        mol.add_atom('H', 0.86681, 0.60144, 0.00000)
+        mol.add_atom('H',  -0.86681, 0.60144, 0.00000)
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
+        cgfs, nuclei = mol.build_basis('sto3g', fname)
+                
+        N = len(cgfs)
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'repulsion_h2o.txt')
+        vals = np.loadtxt(fname).reshape((N,N,N,N))
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
+                    for l in range(N):
+                        res = integrator.repulsion(cgfs[i], cgfs[j], cgfs[k], cgfs[l])
+                        np.testing.assert_almost_equal(res, vals[i,j,k,l], 4)
 
     # def test_two_electron_indices(self):
     #     """

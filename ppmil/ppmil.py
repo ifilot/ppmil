@@ -123,6 +123,10 @@ class PPMIL:
             raise TypeError('Argument cgf1 must be of CGF type')
         if not isinstance(cgf2, CGF):
             raise TypeError('Argument cgf2 must be of CGF type')
+        if not isinstance(cgf3, CGF):
+            raise TypeError('Argument cgf3 must be of CGF type')
+        if not isinstance(cgf4, CGF):
+            raise TypeError('Argument cgf4 must be of CGF type')
 
         s = 0.0
         for gto1 in cgf1.gtos:
@@ -441,6 +445,7 @@ class PPMIL:
             raise TypeError('Argument cgf1 must be of CGF type')
         if not isinstance(cgf2, CGF):
             raise TypeError('Argument cgf2 must be of CGF type')
+        assert len(nucleus) == 3
         
         # early exit if the CGF resides on the nucleus
         cgf1_nuc = np.linalg.norm(cgf1.p - nucleus) < 1e-3
@@ -480,6 +485,7 @@ class PPMIL:
             raise TypeError('Argument cgf1 must be of CGF type')
         if not isinstance(cgf2, CGF):
             raise TypeError('Argument cgf2 must be of CGF type')
+        assert len(nucleus) == 3
         
         # early exit if the CGF resides on the nucleus
         cgf1_nuc = np.linalg.norm(cgf1.p - nucleus) < 1e-3
@@ -613,3 +619,67 @@ class PPMIL:
         vp = self.nuclear(cgf1p, cgf2p, nucp, charge)
         
         return (vp - vm) / (2.0 * delta)
+    
+    def repulsion_deriv(self, cgf1, cgf2, cgf3, cgf4, nucleus, coord):
+        """
+        Calculate geometric derivative for repulsion integral 
+        """
+        # verify that variables are CGFS
+        if not isinstance(cgf1, CGF):
+            raise TypeError('Argument cgf1 must be of CGF type')
+        if not isinstance(cgf2, CGF):
+            raise TypeError('Argument cgf2 must be of CGF type')
+        if not isinstance(cgf3, CGF):
+            raise TypeError('Argument cgf3 must be of CGF type')
+        if not isinstance(cgf4, CGF):
+            raise TypeError('Argument cgf4 must be of CGF type')
+        assert len(nucleus) == 3
+        
+        n1 = np.linalg.norm(cgf1.p - nucleus) < 1e-3
+        n2 = np.linalg.norm(cgf2.p - nucleus) < 1e-3
+        n3 = np.linalg.norm(cgf3.p - nucleus) < 1e-3
+        n4 = np.linalg.norm(cgf4.p - nucleus) < 1e-3
+        
+        if n1 == n2 == n3 == n4:
+            return 0.0
+
+        s = 0.0
+        for gto1 in cgf1.gtos:
+            for gto2 in cgf2.gtos:
+                for gto3 in cgf3.gtos:
+                    for gto4 in cgf4.gtos:
+                        pre = gto1.c * gto2.c * gto3.c * gto4.c
+                        norms = gto1.norm * gto2.norm * gto3.norm * gto4.norm
+                        
+                        t1 = self.__repulsion_deriv_gto(gto1, gto2, gto3, gto4, coord) if n1 else 0.0
+                        t2 = self.__repulsion_deriv_gto(gto2, gto3, gto4, gto1, coord) if n2 else 0.0
+                        t3 = self.__repulsion_deriv_gto(gto3, gto4, gto1, gto2, coord) if n3 else 0.0
+                        t4 = self.__repulsion_deriv_gto(gto4, gto1, gto2, gto3, coord) if n4 else 0.0
+                        
+                        s += pre * norms * (t1 + t2 + t3 + t4)
+        
+        return s
+    
+    def __repulsion_deriv_gto(self, gto1, gto2, gto3, gto4, coord):
+        """
+        Calculate geometric derivative for repulsion integral of four GTOs
+        """
+        if gto1.o[coord] != 0:
+            gto1.o[coord] += 1 # calculate l+1 term
+            tplus = self.__repulsion(gto1, gto2, gto3, gto4)
+            gto1.o[coord] -= 2 # calculate l-1 term
+            
+            tmin = self.__repulsion(gto1, gto2, gto3, gto4)
+            
+            gto1.o[coord] += 1 # recover
+            
+            return 2.0 * gto1.alpha * tplus - gto1.o[coord] * tmin
+        
+        else: # s-type
+            gto1.o[coord] += 1
+            
+            t = self.__repulsion(gto1, gto2, gto3, gto4)
+            
+            gto1.o[coord] -= 1 # recover terms
+            
+            return 2.0 * gto1.alpha * t
