@@ -5,7 +5,7 @@ from .gto import GTO
 from .gamma import Fgamma
 import importlib.util
 import warnings
-from scipy.special import factorial, comb
+from scipy.special import factorial, factorial2, comb
 
 class PPMIL:
     def __init__(self):
@@ -90,7 +90,7 @@ class PPMIL:
         Calculate 1D-dipole integral between two contracted Gaussian functions
         
         cgf1: Contracted Gaussian Function 1
-        cgf2: Contracted Gaussian Function 1
+        cgf2: Contracted Gaussian Function 2
         nucleus: nucleus position
         charge: nucleus charge
         """
@@ -108,6 +108,34 @@ class PPMIL:
                      self.nuclear_gto(gto1, gto2, nucleus)
                  v += t
         return float(charge) * v
+
+    def repulsion(self, cgf1, cgf2, cgf3, cgf4):
+        """
+        Calculate 1D-dipole integral between two contracted Gaussian functions
+        
+        cgf1: Contracted Gaussian Function 1
+        cgf2: Contracted Gaussian Function 2
+        cgf2: Contracted Gaussian Function 3
+        cgf2: Contracted Gaussian Function 4
+        """
+        # verify that variables are CGFS
+        if not isinstance(cgf1, CGF):
+            raise TypeError('Argument cgf1 must be of CGF type')
+        if not isinstance(cgf2, CGF):
+            raise TypeError('Argument cgf2 must be of CGF type')
+
+        s = 0.0
+        for gto1 in cgf1.gtos:
+            for gto2 in cgf2.gtos:
+                for gto3 in cgf3.gtos:
+                    for gto4 in cgf4.gtos:
+                        s += gto1.c * gto1.norm * \
+                             gto2.c * gto2.norm * \
+                             gto3.c * gto3.norm * \
+                             gto4.c * gto4.norm * \
+                             self.__repulsion(gto1, gto2, gto3, gto4)
+                        
+        return s
     
     #
     # AUXILIARY FUNCTIONS
@@ -199,6 +227,12 @@ class PPMIL:
                               gto2.p, gto2.o, gto2.alpha,
                               nucleus)
     
+    def repulsion_gto(self, gto1, gto2, gto3, gto4):
+        """
+        Calculate two-electron integral for four gtos
+        """
+        return self.__repulsion(gto1, gto2, gto3, gto4)
+
     def __dipole(self, p1, p2, alpha1, alpha2, o1, o2, cc, cref):
         """
         Calculate 1D dipole integral using coefficients of two GTOs
@@ -266,36 +300,35 @@ class PPMIL:
                     s += ax[i] * ay[j] * az[k] * Fgamma(i+j+k,rcp2*gamma)
        
         return -2.0 * np.pi / gamma * np.exp(-alpha1*alpha2*rab2/gamma) * s
-       
-    def __A_array(self, l1, l2, pa, pb, cp, g):
-        imax = l1 + l2 +1
-        arr = np.zeros(imax)
-        
-        for i in range(imax):
-            for r in range(i//2+1):
-                for u in range((i-2*r)//2+1):
-                    iI = i - 2*r - u
-                    arr[iI] += self.__A_term(i, r, u, l1, l2, pa, pb, cp, g)
-        
-        return arr
-                    
-    def __A_term(self, i, r, u, l1, l2, pax, pbx, cpx, gamma):
-        return (-1)**i * self.__binomial_prefactor(i, l1, l2, pax, pbx) * \
-               (-1)**u * factorial(i) * np.power(cpx,i - 2*r - 2*u) * \
-               np.power(0.25/gamma,r+u) / factorial(r) / factorial(u) / \
-               factorial(i - 2*r - 2*u)
     
-    def __binomial_prefactor(self, s, ia, ib, xpa, xpb):
+    def __repulsion(self, gto1, gto2, gto3, gto4):
+        rab2 = np.sum(np.power(gto1.p - gto2.p,2))
+        rcd2 = np.sum(np.power(gto3.p - gto4.p,2))
+
+        p = self.__gaussian_product_center(gto1.alpha, gto1.p, gto2.alpha, gto2.p)
+        q = self.__gaussian_product_center(gto3.alpha, gto3.p, gto4.alpha, gto4.p)
+
+        rpq2 = np.sum(np.power(p-q,2))
+
+        gamma1 = gto1.alpha + gto2.alpha
+        gamma2 = gto3.alpha + gto4.alpha
+        delta = 0.25 * (1.0 / gamma1 + 1.0 / gamma2)
+
+        b = []
+        for i in range(0,3):
+            b.append(self.__B_array(gto1.o[i], gto2.o[i], gto3.o[i], gto4.o[i],
+                                    p[i], gto1.p[i], gto2.p[i], q[i], gto3.p[i], gto4.p[i],
+                                    gamma1, gamma2, delta))
+
         s = 0.0
-        
-        for t in range(s+1):
-            if ((s-ia) <= t) and (t <= ib):
-                s += comb(ia, s-t) * \
-                     comb(ib,t) * \
-                     np.power(xpa,ia - s + t) * \
-                     np.power(xpb, ib - t)
-        
-        return s
+        for i in range(gto1.o[0] + gto2.o[0] + gto3.o[0] + gto4.o[0]+1):
+            for j in range(gto1.o[1] + gto2.o[1] + gto3.o[1] + gto4.o[1]+1):
+                for k in range(gto1.o[2] + gto2.o[2] + gto3.o[2] + gto4.o[2]+1):
+                    s += b[0][i] * b[1][j] * b[2][k] * Fgamma(i+j+k, 0.25 * rpq2 / delta)
+
+        return 2.0 * np.power(np.pi, 2.5) / (gamma1 * gamma2 * np.sqrt(gamma1+gamma2)) * \
+               np.exp(-gto1.alpha * gto2.alpha * rab2 / gamma1) * \
+               np.exp(-gto3.alpha * gto4.alpha * rcd2 / gamma2) * s
     
     def __overlap_3d(self, p1, p2, alpha1, alpha2, o1, o2):
         """
@@ -322,7 +355,7 @@ class PPMIL:
         
         for i in range(0, 1 + (l1 + l2) // 2):
             sm += self.__binomial_prefactor(2*i, l1, l2, x1, x2) * \
-                  (1 if i == 0 else scipy.special.factorial2(2 * i - 1)) / \
+                  (1 if i == 0 else factorial2(2 * i - 1)) / \
                   np.power(2 * gamma, i)
             
         return sm
@@ -334,7 +367,7 @@ class PPMIL:
         return (alpha1 * a + alpha2 * b) / (alpha1 + alpha2)
     
     def __binomial_prefactor(self, s, ia, ib, xpa, xpb):
-        sm = 0 # summation term
+        sm = 0
         
         for t in range(0, s+1):
             if (s - ia) <= t and t <= ib:
@@ -343,6 +376,59 @@ class PPMIL:
         
         return sm
     
+    def __A_array(self, l1, l2, pa, pb, cp, g):
+        imax = l1 + l2 +1
+        arr = np.zeros(imax)
+        
+        for i in range(imax):
+            for r in range(i//2+1):
+                for u in range((i-2*r)//2+1):
+                    iI = i - 2*r - u
+                    arr[iI] += self.__A_term(i, r, u, l1, l2, pa, pb, cp, g)
+        
+        return arr
+                    
+    def __A_term(self, i, r, u, l1, l2, pax, pbx, cpx, gamma):
+        return (-1)**i * self.__binomial_prefactor(i, l1, l2, pax, pbx) * \
+               (-1)**u * factorial(i) * np.power(cpx,i - 2*r - 2*u) * \
+               np.power(0.25/gamma,r+u) / factorial(r) / factorial(u) / \
+               factorial(i - 2*r - 2*u)
+
+    def __B_array(self, l1, l2, l3, l4, p, a, b, q, c, d, g1, g2, delta):
+
+        imax = l1 + l2 + l3 + l4 + 1
+        arr_b = np.zeros(imax)
+
+        for i1 in range(l1+l2+1):
+            for i2 in range(l3+l4+1):
+                for r1 in range(i1//2+1):
+                    for r2 in range(i2//2+1):
+                        for u in range((i1+i2)//2 - r1 - r2 + 1):
+                            i = i1 + i2 - 2 * (r1 + r2) - u
+                            arr_b[i] += self.__B_term(i1, i2, r1, r2, u,
+                                                      l1, l2, l3, l4,
+                                                      p, a, b, q, c, d,
+                                                      g1, g2, delta)
+
+        return arr_b
+
+    def __B_term(self, i1, i2, r1, r2, u, l1, l2, l3, l4, 
+                 px, ax, bx, qx, cx, dx, gamma1, gamma2, delta):
+        return self.__fB(i1, l1, l2, px, ax, bx, r1, gamma1) * \
+               np.power(-1, i2) * self.__fB(i2, l3, l4, qx, cx, dx, r2, gamma2) * \
+               np.power(-1, u) * self.__fact_ratio2(i1 + i2 - 2 * (r1 + r2), u) * \
+               np.power(qx - px, i1 + i2 - 2 * (r1 + r2) - 2 * u) / \
+               np.power(delta, i1+i2 - 2 * (r1 + r2) - u)
+
+    def __fB(self, i, l1, l2, p, a, b, r, g):
+        return self.__binomial_prefactor(i, l1, l2, p-a, p-b) * self.__B0(i, r, g)
+
+    def __B0(self, i, r, g):
+        return self.__fact_ratio2(i,r) * np.power(4 * g, r-i)
+
+    def __fact_ratio2(self, a, b):
+        return factorial(a) / factorial(b) / factorial(a - 2*b)
+
     #
     # DERIVATIVE FUNCTIONS
     #
