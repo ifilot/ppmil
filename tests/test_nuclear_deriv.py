@@ -67,7 +67,7 @@ class TestNuclearDeriv(unittest.TestCase):
         Ochg = nuclei[0][1]
         
         fx = integrator.nuclear_deriv(cgfs[4], cgfs[5], O, Ochg, O, 2)
-        ans = calculate_force_finite_difference(molfile, basisfile, 4, 5, 0, 2)
+        ans = calculate_force_finite_difference(molfile, basisfile, 0, 4, 5, 2)
         
         np.testing.assert_almost_equal(fx, ans, 4)
     

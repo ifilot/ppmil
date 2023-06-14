@@ -627,16 +627,18 @@ class PPMIL:
         rcp2 = np.sum(np.power(c-p,2))
         rcpcoord = (c-p)[coord]
         
-        ax = self.__A_array(o1[0], o2[0], p[0] - a[0], p[0] - b[0], p[0] - c[0], gamma)
-        ay = self.__A_array(o1[1], o2[1], p[1] - a[1], p[1] - b[1], p[1] - c[1], gamma)
-        az = self.__A_array(o1[2], o2[2], p[2] - a[2], p[2] - b[2], p[2] - c[2], gamma)
-        ad = self.__A_array_deriv(o1[coord], o2[coord], p[coord] - a[coord],
-                                  p[coord] - b[coord], p[coord] - c[coord],
+        v = []
+        for i in range(0,3):
+            v.append(self.__A_array(o1[i], o2[i], p[i] - a[i], p[i] - b[i], p[i] - c[i], gamma))
+        
+        ad = self.__A_array_deriv(o1[coord], o2[coord], 
+                                  p[coord] - a[coord],
+                                  p[coord] - b[coord], 
+                                  p[coord] - c[coord],
                                   gamma)
         
         # build arrays of all values
         itmax = o1 + o2
-        v = [ax, ay, az]
         v0 = coord
         v1 = (coord+1) % 3
         v2 = (coord+2) % 3

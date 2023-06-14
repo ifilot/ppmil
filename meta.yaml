@@ -32,12 +32,11 @@ test:
     - scipy
     - setuptools
     - pytest
-    - ifilot::pylebedev
   source_files:
     - tests/*.py
     - tests/data/*
   commands:
-    - pytest tests/*
+    - pytest tests/
 
 about:
   home: https://github.com/ifilot/pylebedev
