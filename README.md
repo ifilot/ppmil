@@ -25,7 +25,7 @@ molecular integrals are implemented:
 And also the following geometric derivatives:
 
 - [x] Overlap derivatives
-- [ ] Kinetic derivatives
+- [x] Kinetic derivatives
 - [ ] Nuclear derivatives
 - [ ] Two-electron integrals
 
