@@ -5,7 +5,8 @@ from .gto import GTO
 from .gamma import Fgamma
 import importlib.util
 import warnings
-from scipy.special import factorial, factorial2, comb
+from scipy.special import factorial, factorial2
+from copy import deepcopy
 
 class PPMIL:
     def __init__(self):
@@ -97,6 +98,7 @@ class PPMIL:
             raise TypeError('Argument cgf1 must be of CGF type')
         if not isinstance(cgf2, CGF):
             raise TypeError('Argument cgf2 must be of CGF type')
+        assert len(nucleus) == 3
 
         v = 0.0
         for gto1 in cgf1.gtos:
@@ -563,12 +565,17 @@ class PPMIL:
     def nuclear_deriv(self, cgf1, cgf2, nuc, charge, nucderiv, coord):
         """
         Calculate geometric derivative for nuclear integrals
+        
+        In contrast to the analytical solutions used previously, here
+        a numerical solution is used
         """
         # verify that variables are CGFS
         if not isinstance(cgf1, CGF):
             raise TypeError('Argument cgf1 must be of CGF type')
         if not isinstance(cgf2, CGF):
             raise TypeError('Argument cgf2 must be of CGF type')
+        assert len(nuc) == 3
+        assert len(nucderiv) == 3
         
         # early exit if the CGF resides on the nucleus
         n1 = np.linalg.norm(cgf1.p - nucderiv) < 1e-3
@@ -578,96 +585,31 @@ class PPMIL:
         if n1 == n2 == n3:
             return 0.0
 
-        s = 0.0
+        delta = 1e-5
 
-        for gto1 in cgf1.gtos:
-            for gto2 in cgf2.gtos:
-                
-                t1 = self.__nuclear_deriv_bf(gto1, gto2, nuc, coord) if n1 else 0.0
-                t2 = self.__nuclear_deriv_bf(gto2, gto1, nuc, coord) if n2 else 0.0
-                t3 = self.__nuclear_deriv_op(gto1, gto2, nuc, coord) if n3 else 0.0
+        # create deepcopies of objects
+        cgf1m = deepcopy(cgf1)
+        cgf2m = deepcopy(cgf2)
+        cgf1p = deepcopy(cgf1)
+        cgf2p = deepcopy(cgf2)
+        nucm = deepcopy(nuc)
+        nucp = deepcopy(nuc)
         
-                s += gto1.norm * gto2.norm * gto1.c * gto2.c * (t1 + t2 + t3)
-        
-        return s * float(charge)
-    
-    def __nuclear_deriv_bf(self, gto1, gto2, nucleus, coord):
-        if gto1.o[coord] != 0:
-            gto1.o[coord] += 1 # calculate l+1 term
-            tplus = self.nuclear_gto(gto1, gto2, nucleus)
-
-            gto1.o[coord] -= 2 # calculate l-1 term
-            tmin = self.nuclear_gto(gto1, gto2, nucleus)
+        if n1:
+            cgf1m.p[coord] -= delta
+            cgf1p.p[coord] += delta
+            cgf1m.reset_gto_centers()
+            cgf1p.reset_gto_centers()
+        if n2:
+            cgf2m.p[coord] -= delta
+            cgf2p.p[coord] += delta
+            cgf2m.reset_gto_centers()
+            cgf2p.reset_gto_centers()
+        if n3:
+            nucm[coord] -= delta
+            nucp[coord] += delta
             
-            gto1.o[coord] += 1 # recover terms
-            
-            return 2.0 * gto1.alpha * tplus - gto1.o[coord] * tmin
+        vm = self.nuclear(cgf1m, cgf2m, nucm, charge)
+        vp = self.nuclear(cgf1p, cgf2p, nucp, charge)
         
-        else: # s-type
-            gto1.o[coord] += 1 # calculate l+1 term
-            t = self.nuclear_gto(gto1, gto2, nucleus)
-
-            gto1.o[coord] -= 1 # recover terms
-            
-            return 2.0 * gto1.alpha * t
-        
-    def __nuclear_deriv_op(self, gto1, gto2, nucleus, coord):
-        alpha1 = gto1.alpha
-        alpha2 = gto2.alpha
-        
-        a = gto1.p
-        b = gto2.p
-        c = nucleus
-        o1 = gto1.o
-        o2 = gto2.o
-        
-        gamma = alpha1 + alpha2
-        p = self.__gaussian_product_center(alpha1, a, alpha2, b)
-        rab2 = np.sum(np.power(a-b,2))
-        rcp2 = np.sum(np.power(c-p,2))
-        rcpcoord = (c-p)[coord]
-        
-        v = []
-        for i in range(0,3):
-            v.append(self.__A_array(o1[i], o2[i], p[i] - a[i], p[i] - b[i], p[i] - c[i], gamma))
-        
-        ad = self.__A_array_deriv(o1[coord], o2[coord], 
-                                  p[coord] - a[coord],
-                                  p[coord] - b[coord], 
-                                  p[coord] - c[coord],
-                                  gamma)
-        
-        # build arrays of all values
-        itmax = o1 + o2
-        v0 = coord
-        v1 = (coord+1) % 3
-        v2 = (coord+2) % 3
-        
-        s = 0.0
-        
-        for i in range(itmax[v0]+1):
-            for j in range(itmax[v1]+1):
-                for k in range(itmax[v2]+1):
-                    s += (v[v0][i] * -2.0 * gamma * rcpcoord * \
-                          Fgamma(i+j+k+1,rcp2*gamma) + ad[i] * \
-                          Fgamma(i+j+k,rcp2*gamma)) * v[v1][j] * v[v2][k]
-       
-        return -2.0 * np.pi / gamma * np.exp(-alpha1*alpha2*rab2/gamma) * s
-    
-    def __A_array_deriv(self, l1, l2, pa, pb, cp, g):
-        imax = l1 + l2 +1
-        arr = np.zeros(imax)
-        
-        for i in range(imax):
-            for r in range(i//2+1):
-                for u in range((i-2*r)//2+1):
-                    iI = i - 2*r - u
-                    cppow = i-2*r-2*u
-                    
-                    term = self.__A_term(i, r, u, l1, l2, pa, pb, cp, g)
-        
-                    if cppow != 0 and cp != 0.0:
-                        term *= -1.0 * cppow / cp
-                        arr[iI] += term
-        
-        return arr
+        return (vp - vm) / (2.0 * delta)

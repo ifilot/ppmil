@@ -52,7 +52,10 @@ class TestNuclearDeriv(unittest.TestCase):
         np.testing.assert_almost_equal(fx4, ans4, 4)
         self.assertFalse(fx4 == 0.0)
     
-    def test_derivatives_detail(self):
+    def test_derivatives_h2o_fulltest(self):
+        """
+        Test Derivatives of water
+        """
         # build integrator object
         integrator = PPMIL()
 
@@ -61,42 +64,18 @@ class TestNuclearDeriv(unittest.TestCase):
         mol = Molecule(xyzfile=molfile)
         basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
         cgfs, nuclei = mol.build_basis('sto3g', basisfile)
-
-        # calculate derivative towards H1 in the x-direction
         O = nuclei[0][0]
         Ochg = nuclei[0][1]
-        
-        fx = integrator.nuclear_deriv(cgfs[4], cgfs[5], O, Ochg, O, 2)
-        ans = calculate_force_finite_difference(molfile, basisfile, 0, 4, 5, 2)
-        
-        np.testing.assert_almost_equal(fx, ans, 4)
-    
-    # def test_derivatives_h2o_fulltest(self):
-    #     """
-    #     Test Derivatives of water
-    #     """
-    #     # build integrator object
-    #     integrator = PPMIL()
 
-    #     # build hydrogen molecule
-    #     molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
-    #     mol = Molecule(xyzfile=molfile)
-    #     basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-    #     cgfs, nuclei = mol.build_basis('sto3g', basisfile)
-    #     O = nuclei[0][0]
-    #     Ochg = nuclei[0][1]
-
-    #     # load results from file
-    #     fname = os.path.join(os.path.dirname(__file__), 'data', 'nuclear_deriv_h2o.txt')
-    #     #vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), 3, 3))
-    #     for i in range(0, len(cgfs)): # loop over cgfs
-    #         for j in range(0, len(cgfs)): # loop over cgfs
-    #             for k in range(0,3):  # loop over nuclei
-    #                 for l in range(0,3):  # loop over directions
-    #                     force = integrator.nuclear_deriv(cgfs[i], cgfs[j], O, Ochg, nuclei[k][0], l)
-    #                     val = calculate_force_finite_difference(molfile, basisfile, k, i, j, l)
-    #                     print(i,j,k,l, force, val)
-    #                     np.testing.assert_almost_equal(force, val, 4)
+        # load results from file
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'nuclear_deriv_h2o.txt')
+        vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), 3, 3))
+        for i in range(0, len(cgfs)): # loop over cgfs
+            for j in range(0, len(cgfs)): # loop over cgfs
+                for k in range(0,3):  # loop over nuclei
+                    for l in range(0,3):  # loop over directions
+                        force = integrator.nuclear_deriv(cgfs[i], cgfs[j], O, Ochg, nuclei[k][0], l)
+                        np.testing.assert_almost_equal(force, vals[i,j,k,l], 4)
                         
 
 def calculate_force_finite_difference(molfile, basisfile, 

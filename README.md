@@ -26,7 +26,7 @@ And also the following geometric derivatives:
 
 - [x] Overlap derivatives
 - [x] Kinetic derivatives
-- [ ] Nuclear derivatives
+- [x] Nuclear derivatives
 - [ ] Two-electron integrals
 
 ## Documentation

@@ -23,46 +23,61 @@ def main():
     cgfs, nuclei = mol.build_basis('sto3g', basisfile)
     
     # electronic interaction with atom atid
-    atid = 0
+    atid = 1
     at = nuclei[atid][0]
     atchg = nuclei[atid][1]
+
+    # geometric derivative for atom id
+    geomatid = 1
 
     # load results from file
     fname = os.path.join(os.path.dirname(__file__), '../tests/data', 'nuclear_deriv_h2o.txt')
     #vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), 3, 3))
     
-    forces = np.zeros((len(cgfs), len(cgfs), 3, 3))
+    forces = np.zeros((len(cgfs), len(cgfs), 3))
     vals = np.zeros_like(forces)
     
     for i in range(0, len(cgfs)): # loop over cgfs
         for j in range(0, len(cgfs)): # loop over cgfs
-            for k in range(0,3):  # loop over nuclei
-                for l in range(0,3):  # loop over directions
-                    force = integrator.nuclear_deriv(cgfs[i], cgfs[j], at, atchg, nuclei[k][0], l)
-                    val = calculate_force_finite_difference(molfile, basisfile, k, i, j, l, atid)
-                    vals[i,j,k,l] = val
-                    forces[i,j,k,l] = force
-
-    print(vals[4,5,0,2])
-    print(vals[5,4,0,2])
-    
-    print(forces[4,5,0,2])
-    print(forces[5,4,0,2])
+            for l in range(0,3):  # loop over directions
+                force = integrator.nuclear_deriv(cgfs[i], cgfs[j], at, atchg, nuclei[geomatid][0], l)
+                val = calculate_force_finite_difference(molfile, basisfile, geomatid, i, j, l, atid)
+                vals[i,j,l] = val
+                forces[i,j,l] = force
                     
     diff = np.abs(forces - vals)
     
-    fig, ax = plt.subplots(2,3, dpi=144)
-    for i in range(0,2):
+    cbarw = 0.5
+    fig, ax = plt.subplots(3,3, dpi=144, figsize=(8,8))
+    for i in range(0,3):
         for j in range(0,3):
             if i == 0:
-                ax[i,j].imshow(diff[:,:,0,j], vmin=0, vmax=0.1)
-                ax[i,j].set_title('Error [%s]' % (['x','y','z'])[j])
+                plot_matrix(ax[i,j], forces[:,:,j], 'Force [%s]' % (['x','y','z'])[j], cmap='BrBG')
+            elif i == 1:
+                plot_matrix(ax[i,j], diff[:,:,j], 'Error [%s]' % (['x','y','z'])[j], cmap='PiYG')
             else:
-                ax[i,j].imshow(vals[:,:,0,j])
-                ax[i,j].set_title('Force [%s]' % (['x','y','z'])[j])
+                plot_matrix(ax[i,j], vals[:,:,j], 'Finite difference [%s]' % (['x','y','z'])[j], cmap='BrBG')
 
     plt.tight_layout()
                         
+def plot_matrix(ax, mat, title = None, cmap='PiYG'):
+    """
+    Produce plot of matrix
+    """
+    ax.imshow(mat, vmin=-1, vmax=1, cmap=cmap)
+    for i in range(mat.shape[0]):
+        for j in range(mat.shape[1]):
+            ax.text(i, j, '%.2f' % mat[j,i], ha='center', va='center',
+                    fontsize=7)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.hlines(np.arange(1, mat.shape[0])-0.5, -0.5, mat.shape[0] - 0.5,
+              color='black', linestyle='--', linewidth=1)
+    ax.vlines(np.arange(1, mat.shape[0])-0.5, -0.5, mat.shape[0] - 0.5,
+              color='black', linestyle='--', linewidth=1)
+    
+    if title:
+        ax.set_title(title)
 
 def calculate_force_finite_difference(molfile, basisfile, 
                                       nuc_id, cgf_id1, cgf_id2, coord,
