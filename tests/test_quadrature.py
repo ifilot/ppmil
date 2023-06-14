@@ -35,7 +35,7 @@ class TestQuadrature(unittest.TestCase):
         
         for gto1 in gtos:
             for gto2 in gtos:
-                overlap = integrator.overlap_gto(gto1, gto2)
+                overlap = gto1.norm * gto2.norm * integrator.overlap_gto(gto1, gto2)
                 overlap_quad = quad.quad_overlap(gto1, gto2, 32, 7)
         
                 np.testing.assert_almost_equal(overlap_quad, overlap, 8)
