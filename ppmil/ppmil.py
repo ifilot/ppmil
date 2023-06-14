@@ -559,4 +559,113 @@ class PPMIL:
             gto1.o[coord] -= 1 # recover terms
             
             return 2.0 * gto1.alpha * t
+        
+    def nuclear_deriv(self, cgf1, cgf2, nuc, charge, nucderiv, coord):
+        """
+        Calculate geometric derivative for nuclear integrals
+        """
+        # verify that variables are CGFS
+        if not isinstance(cgf1, CGF):
+            raise TypeError('Argument cgf1 must be of CGF type')
+        if not isinstance(cgf2, CGF):
+            raise TypeError('Argument cgf2 must be of CGF type')
+        
+        # early exit if the CGF resides on the nucleus
+        n1 = np.linalg.norm(cgf1.p - nucderiv) < 1e-3
+        n2 = np.linalg.norm(cgf2.p - nucderiv) < 1e-3
+        n3 = np.linalg.norm(nuc - nucderiv) < 1e-3
+
+        if n1 == n2 == n3:
+            return 0.0
+
+        s = 0.0
+
+        for gto1 in cgf1.gtos:
+            for gto2 in cgf2.gtos:
+                
+                t1 = self.__nuclear_deriv_bf(gto1, gto2, nuc, coord) if n1 else 0.0
+                t2 = self.__nuclear_deriv_bf(gto2, gto1, nuc, coord) if n2 else 0.0
+                t3 = self.__nuclear_deriv_op(gto1, gto2, nuc, coord) if n3 else 0.0
+        
+                s += gto1.norm * gto2.norm * gto1.c * gto2.c * (t1 + t2 + t3)
+        
+        return s * float(charge)
     
+    def __nuclear_deriv_bf(self, gto1, gto2, nucleus, coord):
+        if gto1.o[coord] != 0:
+            gto1.o[coord] += 1 # calculate l+1 term
+            tplus = self.nuclear_gto(gto1, gto2, nucleus)
+
+            gto1.o[coord] -= 2 # calculate l-1 term
+            tmin = self.nuclear_gto(gto1, gto2, nucleus)
+            
+            gto1.o[coord] += 1 # recover terms
+            
+            return 2.0 * gto1.alpha * tplus - gto1.o[coord] * tmin
+        
+        else: # s-type
+            gto1.o[coord] += 1 # calculate l+1 term
+            t = self.nuclear_gto(gto1, gto2, nucleus)
+
+            gto1.o[coord] -= 1 # recover terms
+            
+            return 2.0 * gto1.alpha * t
+        
+    def __nuclear_deriv_op(self, gto1, gto2, nucleus, coord):
+        alpha1 = gto1.alpha
+        alpha2 = gto2.alpha
+        
+        a = gto1.p
+        b = gto2.p
+        c = nucleus
+        o1 = gto1.o
+        o2 = gto2.o
+        
+        gamma = alpha1 + alpha2
+        p = self.__gaussian_product_center(alpha1, a, alpha2, b)
+        rab2 = np.sum(np.power(a-b,2))
+        rcp2 = np.sum(np.power(c-p,2))
+        rcpcoord = (c-p)[coord]
+        
+        ax = self.__A_array(o1[0], o2[0], p[0] - a[0], p[0] - b[0], p[0] - c[0], gamma)
+        ay = self.__A_array(o1[1], o2[1], p[1] - a[1], p[1] - b[1], p[1] - c[1], gamma)
+        az = self.__A_array(o1[2], o2[2], p[2] - a[2], p[2] - b[2], p[2] - c[2], gamma)
+        ad = self.__A_array_deriv(o1[coord], o2[coord], p[coord] - a[coord],
+                                  p[coord] - b[coord], p[coord] - c[coord],
+                                  gamma)
+        
+        # build arrays of all values
+        itmax = o1 + o2
+        v = [ax, ay, az]
+        v0 = coord
+        v1 = (coord+1) % 3
+        v2 = (coord+2) % 3
+        
+        s = 0.0
+        
+        for i in range(itmax[v0]+1):
+            for j in range(itmax[v1]+1):
+                for k in range(itmax[v2]+1):
+                    s += (v[v0][i] * -2.0 * gamma * rcpcoord * \
+                          Fgamma(i+j+k+1,rcp2*gamma) + ad[i] * \
+                          Fgamma(i+j+k,rcp2*gamma)) * v[v1][j] * v[v2][k]
+       
+        return -2.0 * np.pi / gamma * np.exp(-alpha1*alpha2*rab2/gamma) * s
+    
+    def __A_array_deriv(self, l1, l2, pa, pb, cp, g):
+        imax = l1 + l2 +1
+        arr = np.zeros(imax)
+        
+        for i in range(imax):
+            for r in range(i//2+1):
+                for u in range((i-2*r)//2+1):
+                    iI = i - 2*r - u
+                    cppow = i-2*r-2*u
+                    
+                    term = self.__A_term(i, r, u, l1, l2, pa, pb, cp, g)
+        
+                    if cppow != 0 and cp != 0.0:
+                        term *= -1.0 * cppow / cp
+                        arr[iI] += term
+        
+        return arr
