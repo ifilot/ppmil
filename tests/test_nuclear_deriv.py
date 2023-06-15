@@ -75,8 +75,7 @@ class TestNuclearDeriv(unittest.TestCase):
                 for k in range(0,3):  # loop over nuclei
                     for l in range(0,3):  # loop over directions
                         force = integrator.nuclear_deriv(cgfs[i], cgfs[j], O, Ochg, nuclei[k][0], l)
-                        np.testing.assert_almost_equal(force, vals[i,j,k,l], 4)
-                        
+                        np.testing.assert_almost_equal(force, vals[i,j,k,l], 4)            
 
 def calculate_force_finite_difference(molfile, basisfile, 
                                       nuc_id, cgf_id1, cgf_id2, coord):

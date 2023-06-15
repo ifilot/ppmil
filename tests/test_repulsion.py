@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from ppmil import Molecule, PPMIL, GTO
+import pyqint
 
 class TestRepulsion(unittest.TestCase):
 
@@ -71,12 +72,12 @@ class TestRepulsion(unittest.TestCase):
 
         # build hydrogen molecule
         mol = Molecule("H2O")
-        mol.add_atom('H', 0.00000, -0.07579, 0.00000)
+        mol.add_atom('O', 0.00000, -0.07579, 0.00000)
         mol.add_atom('H', 0.86681, 0.60144, 0.00000)
         mol.add_atom('H',  -0.86681, 0.60144, 0.00000)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
         cgfs, nuclei = mol.build_basis('sto3g', fname)
-                
+        
         N = len(cgfs)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'repulsion_h2o.txt')
         vals = np.loadtxt(fname).reshape((N,N,N,N))

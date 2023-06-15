@@ -576,7 +576,7 @@ class PPMIL:
             
             return 2.0 * gto1.alpha * t
         
-    def nuclear_deriv_numerical(self, cgf1, cgf2, nuc, charge, nucderiv, coord):
+    def nuclear_deriv(self, cgf1, cgf2, nuc, charge, nucderiv, coord):
         """
         Calculate geometric derivative for nuclear integrals
         

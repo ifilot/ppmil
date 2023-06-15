@@ -69,7 +69,7 @@ class TestRepulsionDerivatives(unittest.TestCase):
         
         # build hydrogen molecule
         mol = Molecule("H2O")
-        mol.add_atom('H', 0.00000, -0.07579, 0.00000)
+        mol.add_atom('O', 0.00000, -0.07579, 0.00000)
         mol.add_atom('H', 0.86681, 0.60144, 0.00000)
         mol.add_atom('H',  -0.86681, 0.60144, 0.00000)
         basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
@@ -86,7 +86,6 @@ class TestRepulsionDerivatives(unittest.TestCase):
                             for n in range(0,3):  # loop over directions
                                 force = integrator.repulsion_deriv(cgfs[i], cgfs[j], cgfs[k], cgfs[l], nuclei[m][0], n)
                                 np.testing.assert_almost_equal(force, vals[i,j,k,l,m,n], 4)
-                        
 
 def calculate_force_finite_difference(molfile, basisfile, 
                                       cgf_id1, cgf_id2, cgf_id3, cgf_id4, 
