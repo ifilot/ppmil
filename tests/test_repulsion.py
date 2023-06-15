@@ -7,7 +7,6 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from ppmil import Molecule, PPMIL, GTO
-import pyqint
 
 class TestRepulsion(unittest.TestCase):
 
