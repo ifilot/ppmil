@@ -7,6 +7,7 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from ppmil import Molecule, PPMIL
+import pyqint
 
 class TestRepulsionDerivatives(unittest.TestCase):
    
@@ -59,33 +60,32 @@ class TestRepulsionDerivatives(unittest.TestCase):
         np.testing.assert_almost_equal(fx6, ans6, 4)
         self.assertFalse(fx6 == 0.0)
 
-    # def test_derivatives_h2o_fulltest(self):
-    #     """
-    #     Test Derivatives of water
-    #     """
-    #     # build integrator object
-    #     integrator = PPMIL()
+    def test_derivatives_h2o_fulltest(self):
+        """
+        Test Derivatives of water
+        """
+        # build integrator object
+        integrator = PPMIL()
         
-    #     # build hydrogen molecule
-    #     molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
-    #     mol = Molecule(xyzfile=molfile)
-    #     basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-    #     cgfs, nuclei = mol.build_basis('sto3g', basisfile)
-    #     O = nuclei[0][0]
-    #     Ochg = nuclei[0][1]
+        # build hydrogen molecule
+        mol = Molecule("H2O")
+        mol.add_atom('H', 0.00000, -0.07579, 0.00000)
+        mol.add_atom('H', 0.86681, 0.60144, 0.00000)
+        mol.add_atom('H',  -0.86681, 0.60144, 0.00000)
+        basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
+        cgfs, nuclei = mol.build_basis('sto3g', basisfile)
         
-    #     # load results from file
-    #     fname = os.path.join(os.path.dirname(__file__), 'data', 'repulsion_deriv_h2o.txt')
-    #     #vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), (len(cgfs), (len(cgfs), 3, 3))
-    #     for i in range(0, len(cgfs)): # loop over cgfs
-    #         for j in range(0, len(cgfs)): # loop over cgfs
-    #             for k in range(0, len(cgfs)): # loop over cgfs
-    #                 for l in range(0, len(cgfs)): # loop over cgfs
-    #                     for m in range(0,3):  # loop over nuclei
-    #                         for n in range(0,3):  # loop over directions
-    #                             force = integrator.repulsion_deriv(cgfs[i], cgfs[j], cgfs[k], cgfs[l], nuclei[m][0], n)
-    #                             val = calculate_force_finite_difference(molfile, basisfile, i, j, k, l, m, n)
-    #                             np.testing.assert_almost_equal(force, val, 4)
+        # load results from file
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'repulsion_deriv_h2o.txt')
+        vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), len(cgfs), len(cgfs), 3, 3))
+        for i in range(0, len(cgfs)): # loop over cgfs
+            for j in range(0, len(cgfs)): # loop over cgfs
+                for k in range(0, len(cgfs)): # loop over cgfs
+                    for l in range(0, len(cgfs)): # loop over cgfs
+                        for m in range(0,3):  # loop over nuclei
+                            for n in range(0,3):  # loop over directions
+                                force = integrator.repulsion_deriv(cgfs[i], cgfs[j], cgfs[k], cgfs[l], nuclei[m][0], n)
+                                np.testing.assert_almost_equal(force, vals[i,j,k,l,m,n], 4)
                         
 
 def calculate_force_finite_difference(molfile, basisfile, 

@@ -670,10 +670,10 @@ class PPMIL:
     
     def __repulsion_deriv_gto(self, gto1, gto2, gto3, gto4, coord):
         """
-        Calculate geometric derivative for repulsion integral of four GTOs
+        Calculate geometric derivative for repulsion integral of four GTOs        
         """
-        # create deep copy else the adjustment below might affect
-        # the object
+        # create deep copy else the adjustment below *will* affect
+        # the integral in the situation when gto1 == gto_i where (i != 1)
         gto1_copy = deepcopy(gto1)
         
         if gto1_copy.o[coord] != 0:
