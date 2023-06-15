@@ -519,6 +519,10 @@ class PPMIL:
     def __overlap_deriv_gto(self, gto1, gto2, coord):
         """
         Overlap geometric derivative for two GTOs
+        
+        Technically speaking, the situation wherein gto1 == gto2 should be
+        avoided as this will result in aliasing errors. However, this
+        situation will never arise in the computation.
         """
         if gto1.o[coord] != 0:
             gto1.o[coord] += 1 # calculate l+1 term
@@ -548,6 +552,10 @@ class PPMIL:
     def __kinetic_deriv_gto(self, gto1, gto2, coord):
         """
         Kinetic geometric derivative for two GTOs
+        
+        Technically speaking, the situation wherein gto1 == gto2 should be
+        avoided as this will result in aliasing errors. However, this
+        situation will never arise in the computation.
         """
         if gto1.o[coord] != 0:
             gto1.o[coord] += 1 # calculate l+1 term
@@ -568,7 +576,7 @@ class PPMIL:
             
             return 2.0 * gto1.alpha * t
         
-    def nuclear_deriv(self, cgf1, cgf2, nuc, charge, nucderiv, coord):
+    def nuclear_deriv_numerical(self, cgf1, cgf2, nuc, charge, nucderiv, coord):
         """
         Calculate geometric derivative for nuclear integrals
         
@@ -652,9 +660,9 @@ class PPMIL:
                         norms = gto1.norm * gto2.norm * gto3.norm * gto4.norm
                         
                         t1 = self.__repulsion_deriv_gto(gto1, gto2, gto3, gto4, coord) if n1 else 0.0
-                        t2 = self.__repulsion_deriv_gto(gto2, gto3, gto4, gto1, coord) if n2 else 0.0
+                        t2 = self.__repulsion_deriv_gto(gto2, gto1, gto3, gto4, coord) if n2 else 0.0
                         t3 = self.__repulsion_deriv_gto(gto3, gto4, gto1, gto2, coord) if n3 else 0.0
-                        t4 = self.__repulsion_deriv_gto(gto4, gto1, gto2, gto3, coord) if n4 else 0.0
+                        t4 = self.__repulsion_deriv_gto(gto4, gto3, gto1, gto2, coord) if n4 else 0.0                        
                         
                         s += pre * norms * (t1 + t2 + t3 + t4)
         
@@ -664,22 +672,26 @@ class PPMIL:
         """
         Calculate geometric derivative for repulsion integral of four GTOs
         """
-        if gto1.o[coord] != 0:
-            gto1.o[coord] += 1 # calculate l+1 term
-            tplus = self.__repulsion(gto1, gto2, gto3, gto4)
-            gto1.o[coord] -= 2 # calculate l-1 term
+        # create deep copy else the adjustment below might affect
+        # the object
+        gto1_copy = deepcopy(gto1)
+        
+        if gto1_copy.o[coord] != 0:
+            gto1_copy.o[coord] += 1 # calculate l+1 term
+            tplus = self.__repulsion(gto1_copy, gto2, gto3, gto4)
+            gto1_copy.o[coord] -= 2 # calculate l-1 term
             
-            tmin = self.__repulsion(gto1, gto2, gto3, gto4)
+            tmin = self.__repulsion(gto1_copy, gto2, gto3, gto4)
             
-            gto1.o[coord] += 1 # recover
+            gto1_copy.o[coord] += 1 # recover
             
-            return 2.0 * gto1.alpha * tplus - gto1.o[coord] * tmin
+            return 2.0 * gto1_copy.alpha * tplus - gto1_copy.o[coord] * tmin
         
         else: # s-type
-            gto1.o[coord] += 1
+            gto1_copy.o[coord] += 1
             
-            t = self.__repulsion(gto1, gto2, gto3, gto4)
+            t = self.__repulsion(gto1_copy, gto2, gto3, gto4)
             
-            gto1.o[coord] -= 1 # recover terms
+            gto1_copy.o[coord] -= 1 # recover terms
             
-            return 2.0 * gto1.alpha * t
+            return 2.0 * gto1_copy.alpha * t
