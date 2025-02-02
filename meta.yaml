@@ -31,12 +31,11 @@ test:
     - numpy
     - scipy
     - setuptools
-    - nose
+    - pytest
   source_files:
     - tests/*.py
-    - tests/data/*
   commands:
-    - nosetests tests
+    - pytest
 
 about:
   home: https://github.com/ifilot/pylebedev
