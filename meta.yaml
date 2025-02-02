@@ -35,6 +35,9 @@ test:
     - ifilot::pylebedev
   source_files:
     - tests/*.py
+    - tests/data/*.txt
+    - tests/data/*.xyz
+    - tests/data/*.json
   commands:
     - pytest
 
