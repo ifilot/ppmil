@@ -23,6 +23,7 @@ dependencies = [
     "scipy>=1.15",
     "numpy",
     "mendeleev",
+    "pylebedev",
 ]
 
 [tool.setuptools]
