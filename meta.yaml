@@ -32,21 +32,13 @@ test:
     - scipy
     - setuptools
     - pytest
-<<<<<<< HEAD
-    - ifilot::pylebedev
-=======
->>>>>>> 2e61e38c2c234f319acf599b0472749619dab95f
   source_files:
     - tests/*.py
     - tests/data/*.txt
     - tests/data/*.xyz
     - tests/data/*.json
   commands:
-<<<<<<< HEAD
-    - pytest
-=======
     - pytest tests/
->>>>>>> 2e61e38c2c234f319acf599b0472749619dab95f
 
 about:
   home: https://github.com/ifilot/pylebedev
