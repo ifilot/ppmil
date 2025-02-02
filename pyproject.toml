@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ppmil"
+version = "0.3.0"
+authors = [
+  { name="Ivo Filot", email="ivo@ivofilot.nl" }
+]
+maintainers = [
+    { name="Ivo Filot", email="ivo@ivofilot.nl" },
+]
+description = "ppmil"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "GPL-3.0-or-later"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "scipy>=1.15",
+    "numpy",
+    "mendeleev",
+    "pylebedev",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ppmil*"]
+
+[tool.conda.environment]
+name = "demo"
+channels = [
+    "ifilot",
+    "conda-forge",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ifilot/ppmil"
+"Bug Tracker" = "https://github.com/ifilot/ppmil/issues"

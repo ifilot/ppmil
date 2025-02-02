@@ -269,7 +269,7 @@ class PPMIL:
                                    p[cc] - p1[cc], 
                                    p[cc] - p2[cc], gamma)
         
-        return pre * (np.product(wd) + (p2[cc] - cref) * np.product(w))
+        return pre * (np.prod(wd) + (p2[cc] - cref) * np.prod(w))
     
     def __nuclear(self, a, o1, alpha1, b, o2, alpha2, c):
         """

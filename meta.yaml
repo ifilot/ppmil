@@ -1,6 +1,6 @@
 package:
   name: "ppmil"
-  version: "0.2.0"
+  version: "0.3.0"
 
 source:
   path: .
@@ -31,12 +31,15 @@ test:
     - numpy
     - scipy
     - setuptools
-    - nose
+    - pytest
+    - ifilot::pylebedev
   source_files:
     - tests/*.py
-    - tests/data/*
+    - tests/data/*.txt
+    - tests/data/*.xyz
+    - tests/data/*.json
   commands:
-    - nosetests tests
+    - pytest
 
 about:
   home: https://github.com/ifilot/pylebedev
