@@ -24,7 +24,7 @@ jobs:
         /opt/python/cp39-cp39/bin/pip install ppmil --no-index -f ./dist
         /opt/python/cp39-cp39/bin/pytest --verbose tests
     - name: Archive wheels
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: wheels
         path: dist/ppmil-*.whl
@@ -40,7 +40,7 @@ jobs:
       id-token: write
     steps:
     - name: Retrieve packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: wheels
         path: wheelhouse
@@ -63,7 +63,7 @@ jobs:
         run: |
           conda build .
       - name: Archive packages
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: anaconda-packages
           path: /usr/local/conda-bld/noarch/ppmil-*.tar.bz2
@@ -84,7 +84,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Retrieve packages
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: anaconda-packages
           path: packages
