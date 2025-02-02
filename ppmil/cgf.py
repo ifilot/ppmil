@@ -11,12 +11,6 @@ class CGF:
         self.gtos = []
         self.p = _p
 
-    def __reduce__(self):
-        """
-        Used to pickle the class
-        """
-        return (self.__class__, tuple([self.p]), (self.p, self.gtos))
-
     def __str__(self):
         """
         Get string representation of the Contracted Gaussian Functional
@@ -25,6 +19,13 @@ class CGF:
         for i,gto in enumerate(self.gtos):
             res += " %02i | %s" % (i+1, str(gto))
         return res
+
+    def reset_gto_centers(self):
+        """
+        Copy CGF center to GTO centers
+        """
+        for gto in self.gtos:
+            gto.p = self.p
 
     def add_gto(self, c, alpha, l, m, n):
         """
