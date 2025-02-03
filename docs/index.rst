@@ -5,8 +5,10 @@ PPMIL: Pure Python Molecular Orbital Library
    :alt: Development status
 .. image:: https://img.shields.io/github/v/tag/ifilot/ppmil?label=version
    :alt: GitHub tag (latest SemVer)
-.. image:: https://github.com/ifilot/ppmil/actions/workflows/build.yml/badge.svg
-   :target: https://github.com/ifilot/ppmil/actions/workflows/build.yml
+.. image:: https://github.com/ifilot/ppmil/actions/workflows/build_pypi.yml/badge.svg
+   :target: https://github.com/ifilot/ppmil/actions/workflows/build_pypi.yml
+.. image:: https://github.com/ifilot/ppmil/actions/workflows/build_conda.yml/badge.svg
+   :target: https://github.com/ifilot/ppmil/actions/workflows/build_conda.yml
 .. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
    :target: https://www.gnu.org/licenses/gpl-3.0
 
