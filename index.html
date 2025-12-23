@@ -6,10 +6,10 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PPMIL: Pure Python Molecular Orbital Library &mdash; PPMIL  documentation</title>
+  <title>PPMIL: Pure Python Molecular Integral Library &mdash; PPMIL  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=1c6bb0fc" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=9f6e947d" />
       <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
 
   
@@ -69,21 +69,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="ppmil-pure-python-molecular-orbital-library">
-<h1>PPMIL: Pure Python Molecular Orbital Library<a class="headerlink" href="#ppmil-pure-python-molecular-orbital-library" title="Link to this heading"></a></h1>
-<img alt="Development status" src="https://img.shields.io/static/v1?label=status&amp;message=under%20development&amp;color=ff0000" />
+  <section id="ppmil-pure-python-molecular-integral-library">
+<h1>PPMIL: Pure Python Molecular Integral Library<a class="headerlink" href="#ppmil-pure-python-molecular-integral-library" title="Link to this heading"></a></h1>
 <img alt="GitHub tag (latest SemVer)" src="https://img.shields.io/github/v/tag/ifilot/ppmil?label=version" />
 <a class="reference external image-reference" href="https://github.com/ifilot/ppmil/actions/workflows/build_pypi.yml"><img alt="https://github.com/ifilot/ppmil/actions/workflows/build_pypi.yml/badge.svg" src="https://github.com/ifilot/ppmil/actions/workflows/build_pypi.yml/badge.svg" />
 </a>
-<a class="reference external image-reference" href="https://github.com/ifilot/ppmil/actions/workflows/build_conda.yml"><img alt="https://github.com/ifilot/ppmil/actions/workflows/build_conda.yml/badge.svg" src="https://github.com/ifilot/ppmil/actions/workflows/build_conda.yml/badge.svg" />
-</a>
 <a class="reference external image-reference" href="https://www.gnu.org/licenses/gpl-3.0"><img alt="https://img.shields.io/badge/License-GPLv3-blue.svg" src="https://img.shields.io/badge/License-GPLv3-blue.svg" />
 </a>
-<p><strong class="program">PPMIL</strong> is a pure Python package for solving one- and two-electron
-integrals using Cartesian Gaussian basis functions as encountered in
-electronic structure calculations. <strong class="program">PPMIL</strong> has been created as the
-counterpart of <a class="reference external" href="https://pyqint.imc-tue.nl">PyQInt</a> that explicitly does not
-contain a Cython back-end and as such has a more lenient set of dependencies.</p>
+<p><strong class="program">PPMIL</strong> is a pure-Python library for computing one- and two-electron
+integrals over Cartesian Gaussian basis functions, as commonly required in
+electronic structure calculations. It was developed as a counterpart to
+<a class="reference external" href="https://ifilot.github.io/pyqint">PyQInt</a>. Unlike <strong class="program">PyQInt</strong>,
+<strong class="program">PPMIL</strong> does not rely on a Cython back end. While this design choice
+results in lower computational performance, it aims to improve usability and
+accessibility by leveraging only the Python programming language.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong class="program">PPMIL</strong> is stil very much in development. Do not use it for any
+production purposes.</p>
+</div>
 <p><strong class="program">PPMIL</strong> currently supports the following type of integrals:</p>
 <ul class="simple">
 <li><p>Overlap integrals</p></li>
@@ -99,8 +103,7 @@ requests are ideally submitted via the <a class="reference external" href="https
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#windows-anaconda">Windows / Anaconda</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#linux-pypi">Linux / PyPI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#pypi">PyPI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="community_guidelines.html">Community guidelines</a></li>

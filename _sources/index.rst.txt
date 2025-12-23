@@ -1,22 +1,25 @@
-PPMIL: Pure Python Molecular Orbital Library
-============================================
+PPMIL: Pure Python Molecular Integral Library
+=============================================
 
-.. image:: https://img.shields.io/static/v1?label=status&message=under%20development&color=ff0000
-   :alt: Development status
 .. image:: https://img.shields.io/github/v/tag/ifilot/ppmil?label=version
    :alt: GitHub tag (latest SemVer)
 .. image:: https://github.com/ifilot/ppmil/actions/workflows/build_pypi.yml/badge.svg
    :target: https://github.com/ifilot/ppmil/actions/workflows/build_pypi.yml
-.. image:: https://github.com/ifilot/ppmil/actions/workflows/build_conda.yml/badge.svg
-   :target: https://github.com/ifilot/ppmil/actions/workflows/build_conda.yml
 .. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
    :target: https://www.gnu.org/licenses/gpl-3.0
 
-:program:`PPMIL` is a pure Python package for solving one- and two-electron
-integrals using Cartesian Gaussian basis functions as encountered in
-electronic structure calculations. :program:`PPMIL` has been created as the
-counterpart of `PyQInt <https://pyqint.imc-tue.nl>`_ that explicitly does not
-contain a Cython back-end and as such has a more lenient set of dependencies.
+:program:`PPMIL` is a pure-Python library for computing one- and two-electron
+integrals over Cartesian Gaussian basis functions, as commonly required in
+electronic structure calculations. It was developed as a counterpart to
+`PyQInt <https://ifilot.github.io/pyqint>`_. Unlike :program:`PyQInt`,
+:program:`PPMIL` does not rely on a Cython back end. While this design choice
+results in lower computational performance, it aims to improve usability and
+accessibility by leveraging only the Python programming language.
+
+.. warning::
+
+   :program:`PPMIL` is stil very much in development. Do not use it for any
+   production purposes.
 
 :program:`PPMIL` currently supports the following type of integrals:
 
