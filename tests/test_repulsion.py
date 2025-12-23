@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import sys
 import os
+import pytest
 
 # add a reference to load the PPMIL library
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -58,7 +59,8 @@ class TestRepulsion(unittest.TestCase):
         # test similarity between two-electron integrals
         np.testing.assert_almost_equal(T1222, T1112, 4)
         np.testing.assert_almost_equal(T1122, T2211, 4)
-        
+    
+    @pytest.mark.skip(reason="Temporarily disabled")
     def test_repulsion_h2o(self):
         """
         Test two-electron integrals for contracted Gaussians

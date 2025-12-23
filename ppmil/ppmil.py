@@ -14,7 +14,7 @@ class PPMIL:
         if pylebedev_spec is None:
             warnings.warn(
                 "Some functionality of PPMIL depends on PyLebedev. "
-                "Please install PyLebedev. See: https://ppmil.imc-tue.nl/installation.html."
+                "Please install PyLebedev. See: https://ifilot.github.io/ppmil/installation.html."
             )
     
     #

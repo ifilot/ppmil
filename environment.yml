@@ -1,7 +1,0 @@
-name: ppmil
-dependencies:
-  - numpy
-  - scipy
-  - conda-build
-  - conda-verify
-  - anaconda-client

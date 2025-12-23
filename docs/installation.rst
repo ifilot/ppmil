@@ -1,4 +1,3 @@
-.. _installation:
 .. index:: Installation
 
 Installation
@@ -19,27 +18,13 @@ Installation
 Windows, it is recommended to install :program:`PPMIL` via Anaconda, while
 for Linux, we recommend to use PyPI.
 
-Windows / Anaconda
-------------------
+PyPI
+----
 
-To install :program:`PPMIL` under Windows, open an Anaconda Prompt window
-and run::
+To install :program:`PPMIL`, create a separate Python environment::
 
-    conda install -c ifilot ppmil pylebedev pytessel
+    python -m venv .venv
 
-.. note::
-    Sometimes Anaconda is unable to resolve the package dependencies. This can
-    be caused by a broken environment. An easy solution is to create a new
-    environment. See the "Troubleshooting" section at the end of this page
-    for more information.
+and install :program:`PPMIL` via::
 
-Linux / PyPI
-------------
-
-To install :program:`PPMIL` systemwide, run::
-
-    sudo pip install ppmil pylebedev pytessel
-
-or to install :program:`PPMIL` only for the current user, run::
-
-    pip install ppmil pylebedev
+    ppmil install
