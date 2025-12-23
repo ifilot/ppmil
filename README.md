@@ -30,7 +30,3 @@ And also the following geometric derivatives:
 - [x] Kinetic derivatives
 - [x] Nuclear derivatives
 - [x] Two-electron integrals
-
-## Documentation
-
-Detailed documentation can be found at https://ifilot.github.io/ppmil/.
