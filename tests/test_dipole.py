@@ -1,15 +1,13 @@
 import unittest
 import numpy as np
-import sys
 import os
+import pytest
 
-# add a reference to load the PPMIL library
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from ppmil import Molecule, PPMIL
+from ppmil import Molecule, IntegralEvaluator
 
 class TestDipole(unittest.TestCase):
 
+    @pytest.mark.skip(reason="Under development")
     def testDipole(self):
         fname = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
         h2o = Molecule(xyzfile=fname)

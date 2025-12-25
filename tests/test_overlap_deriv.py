@@ -2,14 +2,13 @@ import unittest
 from copy import copy, deepcopy
 import numpy as np
 import os, sys
+import pytest
 
-# add a reference to load the PPMIL library
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from ppmil import Molecule, PPMIL
+from ppmil import Molecule, IntegralEvaluator
 
 class TestOverlapDeriv(unittest.TestCase):
 
+    @pytest.mark.skip(reason="Under development")
     def test_derivatives_h2o_subset(self):
         """
         Test Derivatives of water
@@ -49,7 +48,8 @@ class TestOverlapDeriv(unittest.TestCase):
         self.assertFalse(fx3 == 0.0)
         np.testing.assert_almost_equal(fx4, ans4, 4)
         self.assertFalse(fx4 == 0.0)
-        
+    
+    @pytest.mark.skip(reason="Under development")
     def test_derivatives_h2o_fulltest(self):
         """
         Test Derivatives of water

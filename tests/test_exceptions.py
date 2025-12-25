@@ -1,16 +1,11 @@
 import unittest
-import sys
-import os
 
-# add a reference to load the PPMIL library
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from ppmil import PPMIL, CGF
+from ppmil import IntegralEvaluator, CGF
 
 class TestExceptions(unittest.TestCase):
 
     def testInvalidType(self):        
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(None, None, None, None)
         
         with self.assertRaises(TypeError) as context:
             integrator.overlap(1,1)

@@ -1,12 +1,7 @@
 import unittest
 import numpy as np
-import sys
-import os
 
-# add a reference to load the PPMIL library
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from ppmil import Fgamma
+from ppmil.math.gamma import Fgamma
 
 class TestGammaFunction(unittest.TestCase):
 

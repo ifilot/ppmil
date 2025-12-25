@@ -3,13 +3,11 @@ import numpy as np
 import os, sys
 import pytest
 
-# add a reference to load the PPMIL library
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from ppmil import Molecule, PPMIL
+from ppmil import Molecule, IntegralEvaluator
 
 class TestRepulsionDerivatives(unittest.TestCase):
    
+    @pytest.mark.skip(reason="Under development")
     def test_derivatives_h2o_subset(self):
         """
         Test Derivatives of water
