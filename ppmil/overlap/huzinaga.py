@@ -1,12 +1,13 @@
 import numpy as np
 from scipy.special import factorial2
 
-from .oe import OverlapEngine
+from ..util.gto import GTO
+from .overlap_engine import OverlapEngine
 from ..math.math import gaussian_product_center, binomial_prefactor
 
 class HuzinagaOverlapEngine(OverlapEngine):
     
-    def overlap_primitive(self, gto1, gto2):
+    def overlap_primitive(self, gto1:GTO, gto2:GTO):
         """
         Calculate overlap integral of two GTOs
         """
@@ -25,13 +26,13 @@ class HuzinagaOverlapEngine(OverlapEngine):
         pre = np.power(np.pi / gamma, 1.5) * \
               np.exp(-alpha1 * alpha2 * rab2 / gamma)
         
-        wx = self.overlap_1d(o1[0], o2[0], p[0] - p1[0], p[0] - p2[0], gamma)
-        wy = self.overlap_1d(o1[1], o2[1], p[1] - p1[1], p[1] - p2[1], gamma)
-        wz = self.overlap_1d(o1[2], o2[2], p[2] - p1[2], p[2] - p2[2], gamma)
+        wx = self._overlap_1d(o1[0], o2[0], p[0] - p1[0], p[0] - p2[0], gamma)
+        wy = self._overlap_1d(o1[1], o2[1], p[1] - p1[1], p[1] - p2[1], gamma)
+        wz = self._overlap_1d(o1[2], o2[2], p[2] - p1[2], p[2] - p2[2], gamma)
         
         return pre * wx * wy * wz
     
-    def overlap_1d(self, l1, l2, x1, x2, gamma):
+    def _overlap_1d(self, l1, l2, x1, x2, gamma):
         """
         Calculate the one-dimensional component of the overlap integral
         """

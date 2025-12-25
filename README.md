@@ -30,3 +30,8 @@ And also the following geometric derivatives:
 - [x] Kinetic derivatives
 - [x] Nuclear derivatives
 - [x] Two-electron integrals
+
+## Sources
+
+- [Taketa, Huzinaga and O-ohata, J. Phys. Soc. Jpn. 21, 2313-2324 (1966)](https://journals.jps.jp/doi/abs/10.1143/JPSJ.21.2313)
+- [Petersson and Hellsing,  Eur. J. Phys. 31, 37-46 (2010)](https://iopscience.iop.org/article/10.1088/0143-0807/31/1/004)

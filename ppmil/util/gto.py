@@ -21,7 +21,10 @@ class GTO:
         self.p = np.array(p, dtype=np.float64)
         self.o = np.array(o, dtype=int)
         self.norm = self.__calculate_norm()
-        
+    
+    def __str__(self):
+        return '%i %i %i' % (self.o[0], self.o[1], self.o[2])
+
     def get_amp(self, p):
         """
         Calculate the amplitude (value) of a GTO

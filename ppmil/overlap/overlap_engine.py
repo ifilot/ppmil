@@ -7,5 +7,5 @@ class OverlapEngine(ABC):
     """
 
     @abstractmethod
-    def overlap_primitive(self, g1:GTO, g2:GTO, g3:GTO, g4:GTO):
+    def overlap_primitive(self, g1:GTO, g2:GTO):
         pass

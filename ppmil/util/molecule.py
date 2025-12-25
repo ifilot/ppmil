@@ -5,11 +5,15 @@ import numpy as np
 from .cgf import CGF
 from .gto import GTO
 
+from typing import Optional
+
 class Molecule:
     """
     Molecule class
     """
-    def __init__(self, _name='unknown', xyzfile=None):
+    def __init__(self, 
+                 _name:str='unknown', 
+                 xyzfile:Optional[str]=None):
         self.atoms = []
         self.charges = []
         self.name = _name
@@ -36,7 +40,7 @@ class Molecule:
 
         self.charges.append(0)
 
-    def build_basis(self, name, basis_filename):
+    def build_basis(self, basis_filename):
         f = open(basis_filename, 'r')
         basis = json.load(f)
         f.close()

@@ -17,8 +17,11 @@ class CGF:
         """
         res = "CGF; R=(%f,%f,%f)\n" % tuple(self.p)
         for i,gto in enumerate(self.gtos):
-            res += " %02i | %s" % (i+1, str(gto))
+            res += " %02i | %s\n" % (i+1, str(gto))
         return res
+    
+    def __repr__(self):
+        return self.__str__()
 
     def reset_gto_centers(self):
         """

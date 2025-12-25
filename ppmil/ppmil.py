@@ -36,25 +36,6 @@ class IntegralEvaluator:
                  s += t
         return s
     
-    def kinetic(self, cgf1, cgf2):
-        """
-        Calculate kinetic integral between two contracted Gaussian functions
-        """
-        # verify that variables are CGFs
-        if not isinstance(cgf1, CGF):
-            raise TypeError('Argument cgf1 must be of CGF type')
-        if not isinstance(cgf2, CGF):
-            raise TypeError('Argument cgf2 must be of CGF type')
-        
-        s = 0.0
-        for gto1 in cgf1.gtos:
-            for gto2 in cgf2.gtos:
-                 t = gto1.c * gto2.c * \
-                     gto1.norm * gto2.norm * \
-                     self.kinetic_primitive(gto1, gto2)
-                 s += t
-        return s
-    
     def dipole(self, cgf1, cgf2, cc, cref):
         """
         Calculate 1D-dipole integral between two contracted Gaussian functions
@@ -137,23 +118,7 @@ class IntegralEvaluator:
                         
         return s
     
-    #
-    # AUXILIARY FUNCTIONS
-    #
     
-    def overlap_primitive(self, gto1, gto2):
-        """
-        Calculate overlap integral of two GTOs
-        """
-        # verify that variables are GTOs
-        if not isinstance(gto1, GTO):
-            raise TypeError('Argument gto1 must be of GTO type')
-        if not isinstance(gto2, GTO):
-            raise TypeError('Argument gto2 must be of GTO type')
-
-        return self.__overlap_3d(gto1.p, gto2.p, 
-               gto1.alpha, gto2.alpha, 
-               gto1.o, gto2.o)
     
     def dipole_primitive(self, gto1, gto2, cc, cref=0.0):
         """

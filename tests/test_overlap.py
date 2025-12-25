@@ -6,15 +6,15 @@ from ppmil import HuzinagaOverlapEngine, HellsingOverlapEngine
 
 class TestOverlapHuzinaga(unittest.TestCase):
 
-    def testOverlap(self):
+    def testOverlapHusinaga(self):
         fname = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
         h2o = Molecule(xyzfile=fname)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = h2o.build_basis('sto3g', fname)
+        cgfs, nuclei = h2o.build_basis(fname)
         N = len(cgfs) # basis set size
         
         # build integrator engine
-        integrator = IntegralEvaluator(HuzinagaOverlapEngine(), None, None, None)
+        integrator = IntegralEvaluator(HuzinagaOverlapEngine(), None, None)
 
         S = np.zeros((N,N))
         for i in range(N):
@@ -26,17 +26,15 @@ class TestOverlapHuzinaga(unittest.TestCase):
         exact = np.loadtxt(fname)
         np.testing.assert_almost_equal(S, exact, 4)
 
-class TestOverlapHellsing(unittest.TestCase):
-
-    def testOverlap(self):
+    def testOverlapHellsing(self):
         fname = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
         h2o = Molecule(xyzfile=fname)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = h2o.build_basis('sto3g', fname)
+        cgfs, nuclei = h2o.build_basis(fname)
         N = len(cgfs) # basis set size
         
         # build integrator engine
-        integrator = IntegralEvaluator(HellsingOverlapEngine(), None, None, None)
+        integrator = IntegralEvaluator(HellsingOverlapEngine(), None, None)
 
         S = np.zeros((N,N))
         for i in range(N):
