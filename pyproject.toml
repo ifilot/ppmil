@@ -22,7 +22,6 @@ classifiers = [
 dependencies = [
     "scipy>=1.15",
     "numpy",
-    "pylebedev",
 ]
 
 [tool.setuptools]

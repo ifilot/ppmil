@@ -1,12 +1,7 @@
 import unittest
 import numpy as np
-import sys
 import os
-
-# add a reference to load the PPMIL library
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from ppmil import Molecule, PPMIL
+from ppmil import Molecule, IntegralEvaluator, HuzinagaOverlapEngine
 
 class TestOverlap(unittest.TestCase):
 
@@ -17,7 +12,9 @@ class TestOverlap(unittest.TestCase):
         cgfs, nuclei = h2o.build_basis('sto3g', fname)
         N = len(cgfs) # basis set size
         
-        integrator = PPMIL()
+        # build integrator engine
+        integrator = IntegralEvaluator(HuzinagaOverlapEngine(), None, None, None)
+
         S = np.zeros((N,N))
         for i in range(N):
             for j in range(i,N):
@@ -26,7 +23,7 @@ class TestOverlap(unittest.TestCase):
         # test overlap integrals
         fname = os.path.join(os.path.dirname(__file__), 'data', 'overlap_h2o.txt')
         exact = np.loadtxt(fname)
-        np.testing.assert_almost_equal(S, exact, 4)    
+        np.testing.assert_almost_equal(S, exact, 4)
 
 if __name__ == '__main__':
     unittest.main()

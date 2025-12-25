@@ -3,24 +3,20 @@ import scipy
 from .cgf import CGF
 from .gto import GTO
 from .gamma import Fgamma
-import importlib.util
-import warnings
 from scipy.special import factorial, factorial2
 from copy import deepcopy
 
-class PPMIL:
-    def __init__(self):
-        pylebedev_spec = importlib.util.find_spec('pylebedev')
-        if pylebedev_spec is None:
-            warnings.warn(
-                "Some functionality of PPMIL depends on PyLebedev. "
-                "Please install PyLebedev. See: https://ifilot.github.io/ppmil/installation.html."
-            )
-    
+class IntegralEvaluator:   
+    def __init__(self, overlap, kinetic, nuclear, eri):
+        self.overlap = overlap
+        self.kinetic = kinetic
+        self.nuclear = nuclear
+        self.eri= eri
+
     #
     # CGF INTEGRALS
     #
-    
+
     def overlap(self, cgf1, cgf2):
         """
         Calculate overlap integral between two contracted Gaussian functions
@@ -36,7 +32,7 @@ class PPMIL:
             for gto2 in cgf2.gtos:
                  t = gto1.c * gto2.c * \
                      gto1.norm * gto2.norm * \
-                     self.overlap_gto(gto1, gto2)
+                     self.overlap_primitive(gto1, gto2)
                  s += t
         return s
     
@@ -55,7 +51,7 @@ class PPMIL:
             for gto2 in cgf2.gtos:
                  t = gto1.c * gto2.c * \
                      gto1.norm * gto2.norm * \
-                     self.kinetic_gto(gto1, gto2)
+                     self.kinetic_primitive(gto1, gto2)
                  s += t
         return s
     
@@ -105,7 +101,7 @@ class PPMIL:
             for gto2 in cgf2.gtos:
                  t = gto1.c * gto2.c * \
                      gto1.norm * gto2.norm * \
-                     self.nuclear_gto(gto1, gto2, nucleus)
+                     self.nuclear_primitive(gto1, gto2, nucleus)
                  v += t
         return float(charge) * v
 
@@ -145,7 +141,7 @@ class PPMIL:
     # AUXILIARY FUNCTIONS
     #
     
-    def overlap_gto(self, gto1, gto2):
+    def overlap_primitive(self, gto1, gto2):
         """
         Calculate overlap integral of two GTOs
         """
@@ -159,7 +155,7 @@ class PPMIL:
                gto1.alpha, gto2.alpha, 
                gto1.o, gto2.o)
     
-    def dipole_gto(self, gto1, gto2, cc, cref=0.0):
+    def dipole_primitive(self, gto1, gto2, cc, cref=0.0):
         """
         Calculate dipole integral between two contracted Gaussian functions
         
@@ -178,7 +174,7 @@ class PPMIL:
                              gto1.o, gto2.o,
                              cc, cref)               
     
-    def kinetic_gto(self, gto1, gto2):
+    def kinetic_primitive(self, gto1, gto2):
         """
         Calculate kinetic integral of two GTOs
         """
@@ -192,7 +188,7 @@ class PPMIL:
         # integrals using Gaussian recursion formulas
         
         t0 = gto2.alpha * (2.0 * np.sum(gto2.o) + 3.0) * \
-            self.overlap_gto(gto1, gto2)
+            self.overlap_primitive(gto1, gto2)
         
         t1 = -2.0 * gto2.alpha**2 * ( \
             self.__overlap_3d(gto1.p, gto2.p, 
@@ -222,7 +218,7 @@ class PPMIL:
             
         return t0 + t1 + t2
     
-    def nuclear_gto(self, gto1, gto2, nucleus):
+    def nuclear_primitive(self, gto1, gto2, nucleus):
         """
         Calculate nuclear attraction integral for two GTOs
         """
@@ -230,7 +226,7 @@ class PPMIL:
                               gto2.p, gto2.o, gto2.alpha,
                               nucleus)
     
-    def repulsion_gto(self, gto1, gto2, gto3, gto4):
+    def repulsion_primitive(self, gto1, gto2, gto3, gto4):
         """
         Calculate two-electron integral for four gtos
         """
@@ -465,12 +461,12 @@ class PPMIL:
                 if not cgf1_nuc:
                     t1 = 0.0
                 else:
-                    t1 = self.__overlap_deriv_gto(gto1, gto2, coord)
+                    t1 = self.__overlap_deriv_primitive(gto1, gto2, coord)
 
                 if not cgf2_nuc:
                     t2 = 0.0
                 else:
-                    t2 = self.__overlap_deriv_gto(gto2, gto1, coord)
+                    t2 = self.__overlap_deriv_primitive(gto2, gto1, coord)
 
                 s += gto1.c * gto2.c * \
                      gto1.norm * gto2.norm * (t1 + t2)
@@ -505,18 +501,18 @@ class PPMIL:
                 if not cgf1_nuc:
                     t1 = 0.0
                 else:
-                    t1 = self.__kinetic_deriv_gto(gto1, gto2, coord)
+                    t1 = self.__kinetic_deriv_primitive(gto1, gto2, coord)
 
                 if not cgf2_nuc:
                     t2 = 0.0
                 else:
-                    t2 = self.__kinetic_deriv_gto(gto2, gto1, coord)
+                    t2 = self.__kinetic_deriv_primitive(gto2, gto1, coord)
 
                 s += gto1.c * gto2.c * \
                      gto1.norm * gto2.norm * (t1 + t2)
         return s
     
-    def __overlap_deriv_gto(self, gto1, gto2, coord):
+    def __overlap_deriv_primitive(self, gto1, gto2, coord):
         """
         Overlap geometric derivative for two GTOs
         
@@ -549,7 +545,7 @@ class PPMIL:
             
             return 2.0 * gto1.alpha * t
         
-    def __kinetic_deriv_gto(self, gto1, gto2, coord):
+    def __kinetic_deriv_primitive(self, gto1, gto2, coord):
         """
         Kinetic geometric derivative for two GTOs
         
@@ -559,10 +555,10 @@ class PPMIL:
         """
         if gto1.o[coord] != 0:
             gto1.o[coord] += 1 # calculate l+1 term
-            tplus = self.kinetic_gto(gto1, gto2)
+            tplus = self.kinetic_primitive(gto1, gto2)
 
             gto1.o[coord] -= 2 # calculate l-1 term
-            tmin = self.kinetic_gto(gto1, gto2)
+            tmin = self.kinetic_primitive(gto1, gto2)
             
             gto1.o[coord] += 1 # recover terms
             
@@ -570,7 +566,7 @@ class PPMIL:
         
         else: # s-type
             gto1.o[coord] += 1 # calculate l+1 term
-            t = self.kinetic_gto(gto1, gto2)
+            t = self.kinetic_primitive(gto1, gto2)
 
             gto1.o[coord] -= 1 # recover terms
             
@@ -612,13 +608,13 @@ class PPMIL:
         if n1:
             cgf1m.p[coord] -= delta
             cgf1p.p[coord] += delta
-            cgf1m.reset_gto_centers()
-            cgf1p.reset_gto_centers()
+            cgf1m.reset_primitive_centers()
+            cgf1p.reset_primitive_centers()
         if n2:
             cgf2m.p[coord] -= delta
             cgf2p.p[coord] += delta
-            cgf2m.reset_gto_centers()
-            cgf2p.reset_gto_centers()
+            cgf2m.reset_primitive_centers()
+            cgf2p.reset_primitive_centers()
         if n3:
             nucm[coord] -= delta
             nucp[coord] += delta
@@ -659,16 +655,16 @@ class PPMIL:
                         pre = gto1.c * gto2.c * gto3.c * gto4.c
                         norms = gto1.norm * gto2.norm * gto3.norm * gto4.norm
                         
-                        t1 = self.__repulsion_deriv_gto(gto1, gto2, gto3, gto4, coord) if n1 else 0.0
-                        t2 = self.__repulsion_deriv_gto(gto2, gto1, gto3, gto4, coord) if n2 else 0.0
-                        t3 = self.__repulsion_deriv_gto(gto3, gto4, gto1, gto2, coord) if n3 else 0.0
-                        t4 = self.__repulsion_deriv_gto(gto4, gto3, gto1, gto2, coord) if n4 else 0.0                        
+                        t1 = self.__repulsion_deriv_primitive(gto1, gto2, gto3, gto4, coord) if n1 else 0.0
+                        t2 = self.__repulsion_deriv_primitive(gto2, gto1, gto3, gto4, coord) if n2 else 0.0
+                        t3 = self.__repulsion_deriv_primitive(gto3, gto4, gto1, gto2, coord) if n3 else 0.0
+                        t4 = self.__repulsion_deriv_primitive(gto4, gto3, gto1, gto2, coord) if n4 else 0.0                        
                         
                         s += pre * norms * (t1 + t2 + t3 + t4)
         
         return s
     
-    def __repulsion_deriv_gto(self, gto1, gto2, gto3, gto4, coord):
+    def __repulsion_deriv_primitive(self, gto1, gto2, gto3, gto4, coord):
         """
         Calculate geometric derivative for repulsion integral of four GTOs        
         """

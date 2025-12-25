@@ -7,7 +7,9 @@ def hermite_exp(x,l):
     pre = 2**(-l)
     for i in range(l//2+1):
         H = hermite(l - 2*i)
-        res += factorial(l) / factorial(i) / factorial (l - 2*i) * H(x)
+        f = factorial(l) / factorial(i) / factorial (l - 2*i)
+        print(f)
+        res += f * H(x)
 
     return pre * res
 
