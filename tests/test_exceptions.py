@@ -5,7 +5,7 @@ from ppmil import IntegralEvaluator, CGF
 class TestExceptions(unittest.TestCase):
 
     def testInvalidType(self):        
-        integrator = IntegralEvaluator(None, None, None, None)
+        integrator = IntegralEvaluator(None, None, None)
         
         with self.assertRaises(TypeError) as context:
             integrator.overlap(1,1)
