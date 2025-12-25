@@ -33,9 +33,9 @@ class HuzinagaNuclearEngine(NuclearEngine):
         rab2 = np.sum(np.power(a-b,2))
         rcp2 = np.sum(np.power(c-p,2))
         
-        ax = self.__A_array(o1[0], o2[0], p[0] - a[0], p[0] - b[0], p[0] - c[0], gamma)
-        ay = self.__A_array(o1[1], o2[1], p[1] - a[1], p[1] - b[1], p[1] - c[1], gamma)
-        az = self.__A_array(o1[2], o2[2], p[2] - a[2], p[2] - b[2], p[2] - c[2], gamma)
+        ax = self._A_array(o1[0], o2[0], p[0] - a[0], p[0] - b[0], p[0] - c[0], gamma)
+        ay = self._A_array(o1[1], o2[1], p[1] - a[1], p[1] - b[1], p[1] - c[1], gamma)
+        az = self._A_array(o1[2], o2[2], p[2] - a[2], p[2] - b[2], p[2] - c[2], gamma)
         
         s = 0.0
         
@@ -46,7 +46,7 @@ class HuzinagaNuclearEngine(NuclearEngine):
        
         return -2.0 * np.pi / gamma * np.exp(-alpha1*alpha2*rab2/gamma) * s
     
-    def __A_array(self, l1, l2, pa, pb, cp, g):
+    def _A_array(self, l1, l2, pa, pb, cp, g):
         imax = l1 + l2 +1
         arr = np.zeros(imax)
         
@@ -54,11 +54,11 @@ class HuzinagaNuclearEngine(NuclearEngine):
             for r in range(i//2+1):
                 for u in range((i-2*r)//2+1):
                     iI = i - 2*r - u
-                    arr[iI] += self.__A_term(i, r, u, l1, l2, pa, pb, cp, g)
+                    arr[iI] += self._A_term(i, r, u, l1, l2, pa, pb, cp, g)
         
         return arr
                     
-    def __A_term(self, i, r, u, l1, l2, pax, pbx, cpx, gamma):
+    def _A_term(self, i, r, u, l1, l2, pax, pbx, cpx, gamma):
         return (-1)**i * binomial_prefactor(i, l1, l2, pax, pbx) * \
                (-1)**u * factorial(i) * np.power(cpx,i - 2*r - 2*u) * \
                np.power(0.25/gamma,r+u) / factorial(r) / factorial(u) / \
