@@ -9,5 +9,6 @@ from .integral_evaluator import IntegralEvaluator
 # engines
 from .overlap.huzinaga import HuzinagaOverlapEngine
 from .overlap.hellsing import HellsingOverlapEngine
+from .nuclear.huzinaga import HuzinagaNuclearEngine
 
 from ._version import __version__

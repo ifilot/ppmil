@@ -27,12 +27,6 @@ class IntegralEvaluator:
         return s
 
     def overlap_primitive(self, gto1:GTO, gto2:GTO):
-        # verify that variables are GTOs
-        if not isinstance(gto1, GTO):
-            raise TypeError('Argument gto1 must be of GTO type')
-        if not isinstance(gto2, GTO):
-            raise TypeError('Argument gto2 must be of GTO type')
-
         return self._overlap_engine.overlap_primitive(gto1, gto2)
     
     def overlap_3d(self, p1, p2, alpha1, alpha2, o1, o2):
@@ -99,3 +93,32 @@ class IntegralEvaluator:
                           )
             
         return t0 + t1 + t2
+    
+    def nuclear(self, cgf1, cgf2, nucleus, charge):
+        """
+        Calculate 1D-dipole integral between two contracted Gaussian functions
+        
+        cgf1: Contracted Gaussian Function 1
+        cgf2: Contracted Gaussian Function 2
+        nucleus: nucleus position
+        charge: nucleus charge
+        """
+        # verify that variables are CGFS
+        if not isinstance(cgf1, CGF):
+            raise TypeError('Argument cgf1 must be of CGF type')
+        if not isinstance(cgf2, CGF):
+            raise TypeError('Argument cgf2 must be of CGF type')
+        assert len(nucleus) == 3
+
+        v = 0.0
+        for gto1 in cgf1.gtos:
+            for gto2 in cgf2.gtos:
+                 t = gto1.c * gto2.c * \
+                     gto1.norm * gto2.norm * \
+                     self.nuclear_primitive(gto1, gto2, nucleus)
+                 v += t
+        return float(charge) * v
+
+    def nuclear_primitive(self, gto1:GTO, gto2:GTO, nuclear):
+        return self._nuclear_engine.nuclear_primitive(gto1, gto2, nuclear)
+        

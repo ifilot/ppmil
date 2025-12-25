@@ -1,13 +1,13 @@
 import unittest
 import numpy as np
 import os
-import pytest
 
+from ppmil import GTO
 from ppmil import Molecule, IntegralEvaluator
+from ppmil import HuzinagaNuclearEngine
 
 class TestNuclear(unittest.TestCase):
 
-    @pytest.mark.skip(reason="Under development")
     def test_gto_nuclear(self):
         """
         Test nuclear attraction integral for GTOs
@@ -15,20 +15,19 @@ class TestNuclear(unittest.TestCase):
         V^{(c)}_ij = <gto_i | -1 / |r-Rc| | gto_j>
         """
         # construct integrator object
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(None, HuzinagaNuclearEngine(), None)
 
         # test GTO
         gto1 = GTO(0.154329, 3.425251, [0.0, 0.0, 0.0], [0, 0, 0])
 
-        nuclear = integrator.nuclear_gto(gto1, gto1, [0.0, 0.0, 0.0])
+        nuclear = integrator.nuclear_primitive(gto1, gto1, [0.0, 0.0, 0.0])
         result = -0.9171861107748928
         np.testing.assert_almost_equal(nuclear, result, 4)
         
-        nuclear = integrator.nuclear_gto(gto1, gto1, [0.0, 0.0, 1.0])
+        nuclear = integrator.nuclear_primitive(gto1, gto1, [0.0, 0.0, 1.0])
         result = -0.31049036979675293
         np.testing.assert_almost_equal(nuclear, result, 4)
 
-    @pytest.mark.skip(reason="Under development")
     def test_cgf_nuclear(self):
         """
         Test nuclear attraction integrals for contracted Gaussians
@@ -37,14 +36,14 @@ class TestNuclear(unittest.TestCase):
         V^{(c)}_ij = <cgf_i | -Zc / |r-Rc| | cgf_j>
         """
 
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(None, HuzinagaNuclearEngine(), None)
 
         # build hydrogen molecule
         mol = Molecule("H2")
         mol.add_atom('H', 0.0, 0.0, 0.0)
         mol.add_atom('H', 0.0, 0.0, 1.4)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = mol.build_basis('sto3g', fname)
+        cgfs, nuclei = mol.build_basis(fname)
 
         V1 = np.zeros((2,2))
         V1[0,0] = integrator.nuclear(cgfs[0], cgfs[0], cgfs[0].p, 1)
@@ -66,7 +65,6 @@ class TestNuclear(unittest.TestCase):
         np.testing.assert_almost_equal(V2[1,1], V11, 4)
         np.testing.assert_almost_equal(V2[0,1], V12, 4)
 
-    @pytest.mark.skip(reason="Under development")
     def test_kinetic_h2o(self):
         """
         Test nuclear attraction integrals for contracted Gaussians
@@ -78,10 +76,10 @@ class TestNuclear(unittest.TestCase):
         fname = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
         h2o = Molecule(xyzfile=fname)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = h2o.build_basis('sto3g', fname)
+        cgfs, nuclei = h2o.build_basis(fname)
         N = len(cgfs) # basis set size
         
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(None, HuzinagaNuclearEngine(), None)
         V = np.zeros((N,N))
         for i in range(N):
             for j in range(i,N):
