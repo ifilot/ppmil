@@ -9,15 +9,15 @@ from ..math.gamma_numba import Fgamma
 class HellsingNuclearEngine(NuclearEngine):
 
     def __init__(self, use_kernel=False, lmax=3):
-        self.__use_kernel = use_kernel
-        if self.__use_kernel:
-            self._compute_kernel(lmax)
-        
         # always cache factorials
         self._fact = np.array(
             [factorial(i) for i in range(lmax*3)],
             dtype=np.float64
         )
+
+        self.__use_kernel = use_kernel
+        if self.__use_kernel:
+            self._compute_kernel(lmax)
 
     def nuclear_primitive(self, gto1:GTO, gto2:GTO, nucleus):
         """
