@@ -46,14 +46,18 @@ class HellsingNuclearEngine(NuclearEngine):
             ax, mx = self._A_array(o1[0], o2[0], alpha1, alpha2, a[0]-b[0], gamma, p[0] - c[0])
             ay, my = self._A_array(o1[1], o2[1], alpha1, alpha2, a[1]-b[1], gamma, p[1] - c[1])
             az, mz = self._A_array(o1[2], o2[2], alpha1, alpha2, a[2]-b[2], gamma, p[2] - c[2])
-            
-        s = 0.0
+
+        # pre-calculate nu values
+        nu_max =  mx[0][0] + my[0][0] + mz[0][0] - (mx[0][1] + my[0][1] + mz[0][1])
+        fg = np.array([Fgamma(nu, gamma*rcp2) for nu in range(nu_max+1)])
+
+        s = 0
         for i in range(len(ax)):
             for j in range(len(ay)):
                 for k in range(len(az)):
                     nu = mx[i][0] + my[j][0] + mz[k][0] - (mx[i][1] + my[j][1] + mz[k][1])
-                    s += ax[i] * ay[j] * az[k] * Fgamma(nu,gamma*rcp2)
-       
+                    s += ax[i] * ay[j] * az[k] * fg[nu]
+        
         return -2.0 * np.pi / gamma * np.exp(-alpha1*alpha2*rab2/gamma) * s
 
     def _A_array(self, l1, l2, alpha1, alpha2, x, gamma, pcx):

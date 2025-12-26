@@ -37,12 +37,15 @@ class HuzinagaNuclearEngine(NuclearEngine):
         ay = self._A_array(o1[1], o2[1], p[1] - a[1], p[1] - b[1], p[1] - c[1], gamma)
         az = self._A_array(o1[2], o2[2], p[2] - a[2], p[2] - b[2], p[2] - c[2], gamma)
         
+        # pre-calculate nu values
+        nu_max = np.sum(o1) + np.sum(o2)
+        fg = np.array([Fgamma(nu, gamma*rcp2) for nu in range(nu_max+1)])
+
         s = 0.0
-        
         for i in range(o1[0] + o2[0] + 1):
             for j in range(o1[1] + o2[1] + 1):
                 for k in range(o1[2] + o2[2] + 1):
-                    s += ax[i] * ay[j] * az[k] * Fgamma(i+j+k,rcp2*gamma)
+                    s += ax[i] * ay[j] * az[k] * fg[i+j+k]
        
         return -2.0 * np.pi / gamma * np.exp(-alpha1*alpha2*rab2/gamma) * s
     
