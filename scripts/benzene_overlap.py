@@ -9,7 +9,7 @@ mol = Molecule('benzene', os.path.join(os.path.dirname(__file__), 'data', 'benze
 cgfs, nuclei = mol.build_basis(os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json'))
 
 integrator1 = IntegralEvaluator(HuzinagaOverlapEngine(), HuzinagaNuclearEngine(), None)
-integrator2 = IntegralEvaluator(HellsingOverlapEngine(True), HellsingNuclearEngine(), None)
+integrator2 = IntegralEvaluator(HellsingOverlapEngine(True), HellsingNuclearEngine(True), None)
 
 N = len(cgfs)
 S1 = np.empty((N,N))

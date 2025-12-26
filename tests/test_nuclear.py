@@ -191,6 +191,32 @@ class TestNuclear(unittest.TestCase):
         fname = os.path.join(os.path.dirname(__file__), 'data', 'nuclear_h2o.txt')
         exact = np.loadtxt(fname)
         np.testing.assert_almost_equal(V, exact, 4)
+    
+    def test_nuclear_h2o_hellsing_kernel(self):
+        """
+        Test nuclear attraction integrals for contracted Gaussians
+        for the H2O molecule
+
+        V^{(c)}_ij = <cgf_i | -Zc / |r-Rc| | cgf_j>
+        
+        """
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
+        h2o = Molecule(xyzfile=fname)
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
+        cgfs, nuclei = h2o.build_basis(fname)
+        N = len(cgfs) # basis set size
+        
+        integrator = IntegralEvaluator(None, HellsingNuclearEngine(True), None)
+        V = np.zeros((N,N))
+        for i in range(N):
+            for j in range(i,N):
+                V[i,j] = V[j,i] = integrator.nuclear(cgfs[i], cgfs[j], 
+                                                     nuclei[0][0], nuclei[0][1])
+        
+        # test overlap integrals
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'nuclear_h2o.txt')
+        exact = np.loadtxt(fname)
+        np.testing.assert_almost_equal(V, exact, 4)
 
 if __name__ == '__main__':
     unittest.main()
