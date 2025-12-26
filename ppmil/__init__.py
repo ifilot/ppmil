@@ -11,5 +11,6 @@ from .overlap.huzinaga import HuzinagaOverlapEngine
 from .overlap.hellsing import HellsingOverlapEngine
 from .nuclear.huzinaga import HuzinagaNuclearEngine
 from .nuclear.hellsing import HellsingNuclearEngine
+from .eri.huzinaga import HuzinagaElectronRepulsionEngine
 
 from ._version import __version__

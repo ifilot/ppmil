@@ -1,6 +1,5 @@
 import math
 import numpy as np
-from numba import njit
 
 # Numba-friendly float constants
 _EPS = np.finfo(np.float64).eps
@@ -8,15 +7,12 @@ _MIN = np.finfo(np.float64).tiny  # smallest positive normal
 _FPMIN = _MIN / _EPS
 
 
-@njit
 def gamm_inc(a, x):
-    # Gamma(a) * P(a, x)  (since your gammp returns P(a, x))
     gammap = gammp(a, x)
     gln = gammln(a)
     return math.exp(gln) * gammap
 
 
-@njit
 def gammp(a, x):
     ASWITCH = 100.0
 
@@ -34,7 +30,6 @@ def gammp(a, x):
         return 1.0 - gcf(a, x)
 
 
-@njit
 def gser(a, x):
     gln = gammln(a)
     ap = a
@@ -50,7 +45,6 @@ def gser(a, x):
             return s * math.exp(-x + a * math.log(x) - gln)
 
 
-@njit
 def gammln(xx):
     # tuple = compile-time constant, good for numba
     cof = (
@@ -80,7 +74,6 @@ def gammln(xx):
     return tmp + math.log(2.5066282746310005 * ser / x)
 
 
-@njit
 def gcf(a, x):
     gln = gammln(a)
 
@@ -112,7 +105,6 @@ def gcf(a, x):
     return math.exp(-x + a * math.log(x) - gln) * h
 
 
-@njit
 def gammpapprox(a, x, psig):
     # use tuples instead of lists
     y = (
@@ -167,7 +159,6 @@ def gammpapprox(a, x, psig):
             return 1.0 + ans
 
 
-@njit
 def Fgamma(a, x):
     # clamp x away from 0
     x = math.fabs(x)

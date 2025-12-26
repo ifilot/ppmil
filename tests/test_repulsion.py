@@ -1,14 +1,13 @@
 import unittest
 import numpy as np
-import sys
 import os
-import pytest
 
-from ppmil import Molecule, IntegralEvaluator
+from ppmil import Molecule, GTO
+from ppmil import IntegralEvaluator, HuzinagaElectronRepulsionEngine
+from ppmil.eri.teindex import teindex
 
 class TestRepulsion(unittest.TestCase):
 
-    @pytest.mark.skip(reason="Under development")
     def test_gto_repulsion(self):
         """
         Test two-electron integrals for primitive GTOs
@@ -17,15 +16,14 @@ class TestRepulsion(unittest.TestCase):
         """
 
         # construct integrator object
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(None, None, HuzinagaElectronRepulsionEngine())
 
         # test GTO
         gto1 = GTO(0.154329, 3.425251, [0.0, 0.0, 0.0], [0, 0, 0])
-        repulsion = integrator.repulsion_gto(gto1, gto1, gto1, gto1)
+        repulsion = integrator.repulsion_primitive(gto1, gto1, gto1, gto1)
         result = 0.20141123130697272
         np.testing.assert_almost_equal(repulsion, result, 4)
 
-    @pytest.mark.skip(reason="Under development")
     def test_cgf_repulsion(self):
         """
         Test two-electron integrals for contracted Gaussians
@@ -34,14 +32,14 @@ class TestRepulsion(unittest.TestCase):
         """
 
         # construct integrator object
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(None, None, HuzinagaElectronRepulsionEngine())
 
         # build hydrogen molecule
         mol = Molecule("H2")
         mol.add_atom('H', 0.0, 0.0, 0.0)
         mol.add_atom('H', 0.0, 0.0, 1.4)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = mol.build_basis('sto3g', fname)
+        cgfs, nuclei = mol.build_basis(fname)
 
         T1111 = integrator.repulsion(cgfs[0], cgfs[0], cgfs[0], cgfs[0])
         T1122 = integrator.repulsion(cgfs[0], cgfs[0], cgfs[1], cgfs[1])
@@ -59,7 +57,6 @@ class TestRepulsion(unittest.TestCase):
         np.testing.assert_almost_equal(T1222, T1112, 4)
         np.testing.assert_almost_equal(T1122, T2211, 4)
     
-    @pytest.mark.skip(reason="Temporarily disabled")
     def test_repulsion_h2o(self):
         """
         Test two-electron integrals for contracted Gaussians
@@ -68,7 +65,7 @@ class TestRepulsion(unittest.TestCase):
         """
 
         # construct integrator object
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(None, None, HuzinagaElectronRepulsionEngine())
 
         # build hydrogen molecule
         mol = Molecule("H2O")
@@ -76,30 +73,24 @@ class TestRepulsion(unittest.TestCase):
         mol.add_atom('H', 0.86681, 0.60144, 0.00000)
         mol.add_atom('H',  -0.86681, 0.60144, 0.00000)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = mol.build_basis('sto3g', fname)
+        cgfs, nuclei = mol.build_basis(fname)
         
         N = len(cgfs)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'repulsion_h2o.txt')
         vals = np.loadtxt(fname).reshape((N,N,N,N))
-        for i in range(N):
-            for j in range(N):
-                for k in range(N):
-                    for l in range(N):
-                        res = integrator.repulsion(cgfs[i], cgfs[j], cgfs[k], cgfs[l])
-                        np.testing.assert_almost_equal(res, vals[i,j,k,l], 4)
+        res = integrator.eri_tensor(cgfs)
+        np.testing.assert_almost_equal(res, vals, 4)
 
-    # def test_two_electron_indices(self):
-    #     """
-    #     Test unique two-electron indices
-    #     """
-    #     integrator = PPMIL()
-
-    #     np.testing.assert_almost_equal(integrator.teindex(1,1,2,1), integrator.teindex(1,1,1,2), 4)
-    #     np.testing.assert_almost_equal(integrator.teindex(1,1,2,1), integrator.teindex(2,1,1,1), 4)
-    #     np.testing.assert_almost_equal(integrator.teindex(1,2,1,1), integrator.teindex(2,1,1,1), 4)
-    #     np.testing.assert_almost_equal(integrator.teindex(1,1,1,2), integrator.teindex(1,1,2,1), 4)
-    #     self.assertNotEqual(integrator.teindex(1,1,1,1), integrator.teindex(1,1,2,1))
-    #     self.assertNotEqual(integrator.teindex(1,1,2,1), integrator.teindex(1,1,2,2))
+    def test_two_electron_indices(self):
+        """
+        Test unique two-electron indices
+        """
+        np.testing.assert_almost_equal(teindex(1,1,2,1), teindex(1,1,1,2), 4)
+        np.testing.assert_almost_equal(teindex(1,1,2,1), teindex(2,1,1,1), 4)
+        np.testing.assert_almost_equal(teindex(1,2,1,1), teindex(2,1,1,1), 4)
+        np.testing.assert_almost_equal(teindex(1,1,1,2), teindex(1,1,2,1), 4)
+        self.assertNotEqual(teindex(1,1,1,1), teindex(1,1,2,1))
+        self.assertNotEqual(teindex(1,1,2,1), teindex(1,1,2,2))
 
 if __name__ == '__main__':
     unittest.main()

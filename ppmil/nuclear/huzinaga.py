@@ -2,6 +2,7 @@ import numpy as np
 from scipy.special import factorial
 
 from ..util.gto import GTO
+from ..util.cgf import CGF
 from .nuclear_engine import NuclearEngine
 from ..math.math import binomial_prefactor, gaussian_product_center
 from ..math.gamma import Fgamma
@@ -37,7 +38,7 @@ class HuzinagaNuclearEngine(NuclearEngine):
         ay = self._A_array(o1[1], o2[1], p[1] - a[1], p[1] - b[1], p[1] - c[1], gamma)
         az = self._A_array(o1[2], o2[2], p[2] - a[2], p[2] - b[2], p[2] - c[2], gamma)
         
-        # pre-calculate nu values
+        # pre-calculate Fgamma values
         nu_max = np.sum(o1) + np.sum(o2)
         fg = np.array([Fgamma(nu, gamma*rcp2) for nu in range(nu_max+1)])
 

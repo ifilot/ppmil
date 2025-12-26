@@ -4,7 +4,7 @@ from scipy.special import factorial
 from ..util.gto import GTO
 from .nuclear_engine import NuclearEngine
 from ..math.math import gaussian_product_center
-from ..math.gamma import Fgamma
+from ..math.gamma_numba import Fgamma
 
 class HellsingNuclearEngine(NuclearEngine):
 
@@ -12,6 +12,12 @@ class HellsingNuclearEngine(NuclearEngine):
         self.__use_kernel = use_kernel
         if self.__use_kernel:
             self._compute_kernel(lmax)
+        
+        # always cache factorials
+        self._fact = np.array(
+            [factorial(i) for i in range(lmax*3)],
+            dtype=np.float64
+        )
 
     def nuclear_primitive(self, gto1:GTO, gto2:GTO, nucleus):
         """
@@ -76,7 +82,7 @@ class HellsingNuclearEngine(NuclearEngine):
         arr = []
         mu_u = []
         
-        pre = np.power(-1, l1+l2) * factorial(l1) * factorial(l2)
+        pre = np.power(-1, l1+l2) * self._fact[l1] * self._fact[l2]
 
         for i1 in range(l1//2+1):
             for i2 in range(l2//2+1):
@@ -84,28 +90,28 @@ class HellsingNuclearEngine(NuclearEngine):
                     for o2 in range(l2 - 2*i2+1):
                         for r in range((o1+o2)//2+1):
                             t1 = np.power(-1, o2+r) * \
-                                 factorial(o1 + o2) / \
+                                 self._fact[o1 + o2] / \
                                  np.power(4, i1+i2+r) / \
-                                 factorial(i1) / \
-                                 factorial(i2) / \
-                                 factorial(o1) / \
-                                 factorial(o2) / \
-                                 factorial(r)
+                                 self._fact[i1] / \
+                                 self._fact[i2] / \
+                                 self._fact[o1] / \
+                                 self._fact[o2] / \
+                                 self._fact[r]
                             t2 = np.power(alpha1, o2-i1-r) * \
                                  np.power(alpha2, o1-i2-r) * \
                                  np.power(x, o1+o2-2*r) / \
-                                 factorial(l1 -2*i1 - o1) / \
-                                 factorial(l2 -2*i2 - o2) / \
-                                 factorial(o1 + o2 - 2*r)
+                                 self._fact[l1 -2*i1 - o1] / \
+                                 self._fact[l2 -2*i2 - o2] / \
+                                 self._fact[o1 + o2 - 2*r]
                             
                             mu_x = l1 + l2 - 2*(i1+i2) - (o1+o2)
                             for u in range(mu_x//2+1):
                                 t3 = np.power(-1, u) * \
-                                     factorial(mu_x) * \
+                                     self._fact[mu_x] * \
                                      np.power(pcx, mu_x - 2*u) / \
                                      np.power(4, u) / \
-                                     factorial(u) / \
-                                     factorial(mu_x - 2*u) / \
+                                     self._fact[u] / \
+                                     self._fact[mu_x - 2*u] / \
                                      np.power(gamma, o1 + o2 - r + u)
 
                                 arr.append(t1 * t2 * t3)
@@ -138,11 +144,6 @@ class HellsingNuclearEngine(NuclearEngine):
     def _compute_kernel(self, lmax=3):
         self._lmax = 3
         self._kernel = [[None for _ in range(lmax+1)] for _ in range(lmax+1)]
-
-        self._fact = np.array(
-            [factorial(i) for i in range(lmax*3)],
-            dtype=np.float64
-        )
 
         for i in range(lmax+1):
             for j in range(lmax+1):
