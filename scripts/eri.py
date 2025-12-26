@@ -11,16 +11,11 @@ def main():
     integrator = IntegralEvaluator(None, None, HuzinagaElectronRepulsionEngine())
 
     # build hydrogen molecule
-    mol = Molecule('benzene', os.path.join(os.path.dirname(__file__), 'data', 'benzene.xyz'))
+    mol = Molecule('benzene', os.path.join(os.path.dirname(__file__), 'data', 'co.xyz'))
     cgfs, nuclei = mol.build_basis(os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json'))
 
-    N = len(cgfs)
-    # fname = os.path.join(os.path.dirname(__file__), 'data', 'repulsion_h2o.txt')
-    # vals = np.loadtxt(fname).reshape((N,N,N,N))
-
     st = time.perf_counter()
-    res = integrator.eri_tensor(cgfs)
-    np.testing.assert_almost_equal(res, vals, decimal=4)
+    res = integrator.eri_tensor(cgfs, verbose=True)
     end = time.perf_counter()
     print('Time elapsed (Huzinaga): %.2f s' % (end - st))
 

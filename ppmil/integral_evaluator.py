@@ -123,12 +123,17 @@ class IntegralEvaluator:
         return self._nuclear_engine.nuclear_primitive(gto1, gto2, nuclear)
     
     
-    def eri_tensor(self, cgfs):
+    def eri_tensor(self, cgfs, verbose=False):
         N = len(cgfs)
         tedouble, tejobs = self._build_jobs(N)
 
         nproc = cpu_count()
         chunks = np.array_split(tejobs, nproc)
+
+        if verbose:
+            print('Calculating electron repulsion integrals')
+            print('Spawning %i threads' % nproc)
+            print('Calculating %i ERI' % len(tedouble))
 
         with Pool(nproc) as pool:
             results = pool.map(
