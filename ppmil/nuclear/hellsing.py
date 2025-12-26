@@ -8,10 +8,10 @@ from ..math.gamma import Fgamma
 
 class HellsingNuclearEngine(NuclearEngine):
 
-    def __init__(self, use_kernel=False):
+    def __init__(self, use_kernel=False, lmax=3):
         self.__use_kernel = use_kernel
         if self.__use_kernel:
-            self._compute_kernel()
+            self._compute_kernel(lmax)
 
     def nuclear_primitive(self, gto1:GTO, gto2:GTO, nucleus):
         """
@@ -20,6 +20,18 @@ class HellsingNuclearEngine(NuclearEngine):
         return self._nuclear(gto1.p, gto1.o, gto1.alpha,
                              gto2.p, gto2.o, gto2.alpha,
                              nucleus)
+
+    def get_kernel_coefficients(self, l1, l2):
+        if self.__use_kernel and l1 <= self._lmax and l2 <= self._lmax:
+            return self._kernel[l1][l2]
+        else:
+            return None
+        
+    def print_kernel_coefficients(self, l1, l2):
+        terms = self.get_kernel_coefficients(l1, l2)
+
+        for i,(s,a1,a2,gam,xp,pcxp,coeff) in enumerate(zip(*terms)):
+            print('%i: c=%+4.2f  a1=%i  a2=%i  gam=%i  xp=%i  pcxp=%i  mu=%i  u=%i' % ((i+1),s,a1,a2,gam,xp,pcxp,coeff[0],coeff[1]))
 
     def _nuclear(self, a, o1, alpha1, b, o2, alpha2, c):
         """
@@ -47,7 +59,7 @@ class HellsingNuclearEngine(NuclearEngine):
             ay, my = self._A_array(o1[1], o2[1], alpha1, alpha2, a[1]-b[1], gamma, p[1] - c[1])
             az, mz = self._A_array(o1[2], o2[2], alpha1, alpha2, a[2]-b[2], gamma, p[2] - c[2])
 
-        # pre-calculate nu values
+        # pre-calculate Fgamma values
         nu_max =  mx[0][0] + my[0][0] + mz[0][0] - (mx[0][1] + my[0][1] + mz[0][1])
         fg = np.array([Fgamma(nu, gamma*rcp2) for nu in range(nu_max+1)])
 
@@ -105,12 +117,26 @@ class HellsingNuclearEngine(NuclearEngine):
         terms = self._kernel[l1][l2]
         arr = np.empty(len(terms[0]))
 
+        if l1 == l2 == 0:
+            return np.asarray([1.0]), [(0,0)]
+
+        # 1: c=-1.00  a1=0  a2=0  gam=0  xp=0  pcxp=1  mu=1  u=0
+        # 2: c=-1.00  a1=0  a2=1  gam=1  xp=1  pcxp=0  mu=0  u=0
+        if l1 == 1 and l2 == 0:
+            return np.asarray([-pcx, -alpha2/gamma*x]), [(1,0),(0,0)]
+
+        # 1: c=-1.00  a1=0  a2=0  gam=0  xp=0  pcxp=1  mu=1  u=0
+        # 2: c=+1.00  a1=1  a2=0  gam=1  xp=1  pcxp=0  mu=0  u=0
+        if l1 == 0 and l2 == 1:
+            return np.asarray([-pcx, alpha1/gamma*x]), [(1,0),(0,0)]
+
         for i,(s,a1,a2,gam,xp,pcxp,_) in enumerate(zip(*terms)):
             arr[i] = (s * alpha1**a1 * alpha2**a2 / gamma**gam * x**xp * pcx**pcxp)
 
         return np.asarray(arr), terms[-1]
     
     def _compute_kernel(self, lmax=3):
+        self._lmax = 3
         self._kernel = [[None for _ in range(lmax+1)] for _ in range(lmax+1)]
 
         self._fact = np.array(
