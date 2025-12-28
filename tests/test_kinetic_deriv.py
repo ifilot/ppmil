@@ -1,26 +1,24 @@
 import unittest
-from copy import copy, deepcopy
 import numpy as np
-import pytest
+import os
 
-from ppmil import Molecule, IntegralEvaluator
+from ppmil import Molecule, IntegralEvaluator, HuzinagaOverlapEngine, HellsingOverlapEngine
 
 class TestKineticDeriv(unittest.TestCase):
 
-    @pytest.mark.skip(reason="Under development")
     def test_derivatives_h2o_subset(self):
         """
         Test Derivatives of water
         """
 
         # build integrator object
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(HuzinagaOverlapEngine(), None, None)
 
         # build hydrogen molecule
         molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
         mol = Molecule(xyzfile=molfile)
         basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = mol.build_basis('sto3g', basisfile)
+        cgfs, nuclei = mol.build_basis(basisfile)
 
         # calculate derivative towards H1 in the x-direction
         H1pos = nuclei[1][0]
@@ -48,19 +46,41 @@ class TestKineticDeriv(unittest.TestCase):
         np.testing.assert_almost_equal(fx4, ans4, 4)
         self.assertFalse(fx4 == 0.0)
         
-    @pytest.mark.skip(reason="Under development")
     def test_derivatives_h2o_fulltest(self):
         """
         Test Derivatives of water
         """
         # build integrator object
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(HuzinagaOverlapEngine(), None, None)
 
         # build hydrogen molecule
         molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
         mol = Molecule(xyzfile=molfile)
         basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = mol.build_basis('sto3g', basisfile)
+        cgfs, nuclei = mol.build_basis(basisfile)
+
+        # load results from file
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'kinetic_deriv_h2o.txt')
+        vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), 3, 3))
+        for i in range(0, len(cgfs)): # loop over cgfs
+            for j in range(0, len(cgfs)): # loop over cgfs
+                for k in range(0,3): # loop over nuclei
+                    for l in range(0,3): # loop over directions
+                        force = integrator.kinetic_deriv(cgfs[i], cgfs[j], nuclei[k][0], l)
+                        np.testing.assert_almost_equal(force, vals[i,j,k,l], 4)
+
+    def test_derivatives_h2o_fulltest_hellsing(self):
+        """
+        Test Derivatives of water
+        """
+        # build integrator object
+        integrator = IntegralEvaluator(HellsingOverlapEngine(), None, None)
+
+        # build hydrogen molecule
+        molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
+        mol = Molecule(xyzfile=molfile)
+        basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
+        cgfs, nuclei = mol.build_basis(basisfile)
 
         # load results from file
         fname = os.path.join(os.path.dirname(__file__), 'data', 'kinetic_deriv_h2o.txt')
@@ -76,7 +96,7 @@ class TestKineticDeriv(unittest.TestCase):
 def calculate_force_finite_difference(molfile, basisfile, 
                                       nuc_id, cgf_id1, cgf_id2, coord):
     # build integrator object
-    integrator = PPMIL()
+    integrator = IntegralEvaluator(HuzinagaOverlapEngine(), None, None)
 
     # distance
     diff = 0.00001
@@ -85,7 +105,7 @@ def calculate_force_finite_difference(molfile, basisfile,
     for i,v in enumerate([-1,1]):
         mol = Molecule(xyzfile=molfile)
         mol.atoms[nuc_id][1][coord] += v * diff / 2
-        cgfs, nuclei = mol.build_basis('sto3g', basisfile)
+        cgfs, nuclei = mol.build_basis(basisfile)
         vals[i] = integrator.kinetic(cgfs[cgf_id1], cgfs[cgf_id2])
 
     return (vals[1] - vals[0]) / diff

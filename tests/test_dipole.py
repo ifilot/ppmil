@@ -3,19 +3,18 @@ import numpy as np
 import os
 import pytest
 
-from ppmil import Molecule, IntegralEvaluator
+from ppmil import Molecule, IntegralEvaluator, HuzinagaOverlapEngine
 
 class TestDipole(unittest.TestCase):
 
-    @pytest.mark.skip(reason="Under development")
     def testDipole(self):
         fname = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
         h2o = Molecule(xyzfile=fname)
         fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
-        cgfs, nuclei = h2o.build_basis('sto3g', fname)
+        cgfs, nuclei = h2o.build_basis(fname)
         N = len(cgfs) # basis set size
         
-        integrator = PPMIL()
+        integrator = IntegralEvaluator(HuzinagaOverlapEngine(), None, None)
         dx = np.zeros((N,N))
         dy = np.zeros((N,N))
         dz = np.zeros((N,N))
