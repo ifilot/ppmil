@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from ppmil.math.gamma import Fgamma
+from .math.gamma_numba import Fgamma
 
 class TestGammaFunction(unittest.TestCase):
 

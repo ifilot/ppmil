@@ -48,6 +48,47 @@ class TestNuclearDeriv(unittest.TestCase):
         self.assertFalse(fx3 == 0.0)
         np.testing.assert_almost_equal(fx4, ans4, 4)
         self.assertFalse(fx4 == 0.0)
+
+    def test_derivatives_h2o_subset_analytical(self):
+        """
+        Test Derivatives of water
+        """
+        # build integrator object
+        engine = HuzinagaNuclearEngine()
+
+        # build hydrogen molecule
+        molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
+        mol = Molecule(xyzfile=molfile)
+        basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
+        cgfs, nuclei = mol.build_basis(basisfile)
+
+        # calculate derivative towards H1 in the x-direction
+        H1pos = nuclei[1][0]
+        O = nuclei[0][0]
+        Ochg = nuclei[0][1]
+        fx1 = engine.nuclear_deriv(cgfs[2], cgfs[2], O, Ochg, H1pos, 0) # 2px
+        fx2 = engine.nuclear_deriv(cgfs[2], cgfs[3], O, Ochg, H1pos, 0) # 2py
+
+        ans1 = calculate_force_finite_difference(molfile, basisfile, 1, 2, 2, 0)
+        ans2 = calculate_force_finite_difference(molfile, basisfile, 1, 3, 3, 0)
+
+        # assert that the overlap of two CGFs that spawn from
+        # the same nucleus will not change in energy due to a
+        # change of the nucleus coordinates
+        np.testing.assert_almost_equal(fx1, ans1, 4)
+        np.testing.assert_almost_equal(fx2, ans2, 4)
+
+        # # assert that the cross-terms will change
+        fx3 = engine.nuclear_deriv(cgfs[2], cgfs[5], O, Ochg, nuclei[1][0], 0) # 2px
+        fx4 = engine.nuclear_deriv(cgfs[2], cgfs[5], O, Ochg, nuclei[1][0], 0) # 2px
+
+        ans3 = calculate_force_finite_difference(molfile, basisfile, 1, 2, 5, 0)
+        ans4 = calculate_force_finite_difference(molfile, basisfile, 1, 2, 5, 0)
+
+        np.testing.assert_almost_equal(fx3, ans3, 4)
+        self.assertFalse(fx3 == 0.0)
+        np.testing.assert_almost_equal(fx4, ans4, 4)
+        self.assertFalse(fx4 == 0.0)
     
     def test_derivatives_h2o_fulltest(self):
         """
@@ -56,7 +97,7 @@ class TestNuclearDeriv(unittest.TestCase):
         # build integrator object
         integrator = IntegralEvaluator(None, HuzinagaNuclearEngine(), None)
 
-        # build hydrogen molecule
+        # build water molecule
         molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
         mol = Molecule(xyzfile=molfile)
         basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
@@ -67,12 +108,41 @@ class TestNuclearDeriv(unittest.TestCase):
         # load results from file
         fname = os.path.join(os.path.dirname(__file__), 'data', 'nuclear_deriv_h2o.txt')
         vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), 3, 3))
+        forces = np.empty_like(vals)
         for i in range(0, len(cgfs)): # loop over cgfs
             for j in range(0, len(cgfs)): # loop over cgfs
                 for k in range(0,3):  # loop over nuclei
                     for l in range(0,3):  # loop over directions
-                        force = integrator.nuclear_deriv(cgfs[i], cgfs[j], O, Ochg, nuclei[k][0], l)
-                        np.testing.assert_almost_equal(force, vals[i,j,k,l], 4)
+                        forces[i,j,k,l] = integrator.nuclear_deriv(cgfs[i], cgfs[j], O, Ochg, nuclei[k][0], l)
+        
+        np.testing.assert_almost_equal(forces, vals, 4)
+
+    def test_derivatives_h2o_fulltest_analytical(self):
+        """
+        Test Derivatives of water
+        """
+        # build integrator object
+        engine = HuzinagaNuclearEngine()
+
+        # build water molecule
+        molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
+        mol = Molecule(xyzfile=molfile)
+        basisfile = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
+        cgfs, nuclei = mol.build_basis(basisfile)
+        O = nuclei[0][0]
+        Ochg = nuclei[0][1]
+
+        # load results from file
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'nuclear_deriv_h2o.txt')
+        vals = np.loadtxt(fname).reshape((len(cgfs), len(cgfs), 3, 3))
+        forces = np.empty_like(vals)
+        for i in range(0, len(cgfs)): # loop over cgfs
+            for j in range(0, len(cgfs)): # loop over cgfs
+                for k in range(0,3):  # loop over nuclei
+                    for l in range(0,3):  # loop over directions
+                        forces[i,j,k,l] = engine.nuclear_deriv(cgfs[i], cgfs[j], O, Ochg, nuclei[k][0], l)
+        
+        np.testing.assert_almost_equal(forces, vals, 4)
 
     def test_derivatives_h2o_fulltest_hellsing(self):
         """
