@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.special import factorial
 
 from ..util.gto import GTO
 from .electron_repulsion_engine import ElectronRepulsionEngine
@@ -84,6 +83,10 @@ class HellsingElectronRepulsionEngine(ElectronRepulsionEngine):
         gamma2 = a3 + a4
         eta = gamma1 * gamma2 / (gamma1 + gamma2)
 
+        pre = 2.0 * np.power(np.pi, 2.5) / (gamma1 * gamma2 * np.sqrt(gamma1+gamma2)) * \
+              np.exp(-gto1.alpha * gto2.alpha * rab2 / gamma1) * \
+              np.exp(-gto3.alpha * gto4.alpha * rcd2 / gamma2)
+
         # grab coefficients from kernel
         # b[x][0] -> float-constants
         # b[x][1] -> integers
@@ -107,34 +110,35 @@ class HellsingElectronRepulsionEngine(ElectronRepulsionEngine):
         nu_max = np.sum(gto1.o) + np.sum(gto2.o) + np.sum(gto3.o) + np.sum(gto4.o)
         fg = np.array([Fgamma(nu, eta * rpq2) for nu in range(nu_max+1)])
 
-        # pre-calculate powers
-        base1 = np.array([a1, a2, a3, a4, gamma1, gamma2, 
-                          gto1.p[0] - gto2.p[0], # ax - bx
-                          gto3.p[0] - gto4.p[0], # cx - dx
-                          eta, pq[0]])
-        polx = cx * np.prod(np.power(base1, powx), axis = 1)
-        base2 = np.array([a1, a2, a3, a4, gamma1, gamma2, 
-                          gto1.p[1] - gto2.p[1], # ay - by
-                          gto3.p[1] - gto4.p[1], # ay - by
-                          eta, pq[1]])
-        poly = cy * np.prod(np.power(base2, powy), axis = 1)
-        base3 = np.array([a1, a2, a3, a4, gamma1, gamma2, 
-                          gto1.p[2] - gto2.p[2], # az - bz
-                          gto3.p[2] - gto4.p[2], # az - bz
-                          eta, pq[2]])
-        polz = cz * np.prod(np.power(base3, powz), axis = 1)
+        # pre-calculate power evaluations
+        bases = np.array([
+            [a1, a2, a3, a4, gamma1, gamma2,
+            gto1.p[d] - gto2.p[d],
+            gto3.p[d] - gto4.p[d],
+            eta, pq[d]]
+            for d in range(3)
+        ])
+        polx = cx * np.prod(bases[0] ** powx, axis=1)
+        poly = cy * np.prod(bases[1] ** powy, axis=1)
+        polz = cz * np.prod(bases[2] ** powz, axis=1)
+
+        # pre-calculate nu-values
+        nux = coeffx[:, -2] - coeffx[:, -1]
+        nuy = coeffy[:, -2] - coeffy[:, -1]
+        nuz = coeffz[:, -2] - coeffz[:, -1]
 
         # calculate sum
         s = 0.0
         for i in range(len(cx)):
+            pi = polx[i]
+            nui = nux[i]
             for j in range(len(cy)):
+                pij = pi * poly[j]
+                nuij = nui + nuy[j]
                 for k in range(len(cz)):
-                    nu = coeffx[i,-2] + coeffy[j,-2] + coeffz[k,-2] - (coeffx[i,-1] + coeffy[j,-1] + coeffz[k,-1])
-                    s += polx[i] * poly[j] * polz[k] * fg[nu]
+                    s += pij * polz[k] * fg[nuij + nuz[k]]
 
-        return 2.0 * np.power(np.pi, 2.5) / (gamma1 * gamma2 * np.sqrt(gamma1+gamma2)) * \
-               np.exp(-gto1.alpha * gto2.alpha * rab2 / gamma1) * \
-               np.exp(-gto3.alpha * gto4.alpha * rcd2 / gamma2) * s
+        return pre * s
     
     def _B_array(self, l1, l2, l3, l4, 
                        a1, a2, a3, a4,
