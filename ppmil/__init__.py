@@ -13,5 +13,6 @@ from .nuclear.huzinaga import HuzinagaNuclearEngine
 from .nuclear.hellsing import HellsingNuclearEngine
 from .eri.huzinaga import HuzinagaElectronRepulsionEngine
 from .eri.hellsing import HellsingElectronRepulsionEngine
+from .erieval.erieval import ERIEvaluator
 
 from ._version import __version__

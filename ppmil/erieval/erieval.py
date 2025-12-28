@@ -1,9 +1,18 @@
 import numpy as np
 from multiprocessing import Pool, cpu_count
+from dataclasses import dataclass
+from collections import defaultdict
 
 from ..eri.teindex import teindex
 from ..eri.electron_repulsion_engine import ElectronRepulsionEngine
 from ..util.cgf import CGF
+
+@dataclass
+class Shell:
+    center: int
+    l: int
+    ao_indices: list   # indices into cgfs
+    nfunc: int
 
 class ERIEvaluator:
 
@@ -198,3 +207,97 @@ class ERIEvaluator:
                                 jobs.append((idx, i, j, k, l))
 
         return tedouble, jobs
+
+    def _build_shells(self, cgfs):
+        """
+        Group pure-l CGFs into shells suitable for shell-based ERI evaluation.
+
+        Parameters
+        ----------
+        cgfs : list
+            List of contracted Gaussian functions (AOs).
+            Each CGF must have a single angular momentum l.
+
+        Returns
+        -------
+        shells : list of Shell
+            List of shells.
+        """
+        shell_dict = defaultdict(list)
+
+        # Group AO indices by shell key
+        for ao_index, cgf in enumerate(cgfs):
+            l = sum(cgf.gtos[0].o)
+
+            key = (
+                tuple(float(x) for x in cgf.gtos[0].p),
+                l,
+                tuple(gto.alpha for gto in cgf.gtos),
+                tuple(gto.c for gto in cgf.gtos),
+            )
+
+            shell_dict[key].append(ao_index)
+
+        # Build Shell objects
+        shells = []
+
+        for key, ao_indices in shell_dict.items():
+            center, l, _, _ = key
+
+            shells.append(
+                Shell(
+                    center=center,
+                    l=l,
+                    ao_indices=ao_indices,
+                    nfunc=len(ao_indices)
+                )
+            )
+
+        return shells
+    
+    def build_shell_jobs(self, shells):
+        """
+        Build shell-quartet ERI jobs partitioned by shell angular-momentum type.
+
+        Returns
+        -------
+        jobs_by_type : dict
+            keys: (lI, lJ, lK, lL)
+            values: list of (I, J, K, L) shell quartets
+        """
+        nshell = len(shells)
+        jobs_by_type = defaultdict(list)
+
+        def pair_index(a, b):
+            if a < b:
+                a, b = b, a
+            return a * (a + 1) // 2 + b
+
+        for I in range(nshell):
+            for J in range(I + 1):
+                IJ = pair_index(I, J)
+
+                lI, lJ = shells[I].l, shells[J].l
+                if lI < lJ:
+                    lI, lJ = lJ, lI
+
+                for K in range(I + 1):
+                    max_L = J if K == I else K
+
+                    for L in range(max_L + 1):
+                        KL = pair_index(K, L)
+
+                        if IJ < KL:
+                            continue
+
+                        lK, lL = shells[K].l, shells[L].l
+                        if lK < lL:
+                            lK, lL = lL, lK
+
+                        # enforce (lI,lJ) >= (lK,lL)
+                        if (lI, lJ) < (lK, lL):
+                            continue
+
+                        jobs_by_type[(lI, lJ, lK, lL)].append((I, J, K, L))
+
+        return jobs_by_type
