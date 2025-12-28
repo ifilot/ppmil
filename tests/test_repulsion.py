@@ -165,5 +165,29 @@ class TestRepulsion(unittest.TestCase):
         res = integrator.eri_tensor(cgfs)
         np.testing.assert_almost_equal(res, vals, 4)
 
+    def test_repulsion_h2o_hellsing_kernel(self):
+        """
+        Test two-electron integrals for contracted Gaussians
+
+        (ij|kl) = <cgf_i cgf_j | r_ij | cgf_k cgf_l>
+        """
+
+        # construct integrator object
+        integrator = IntegralEvaluator(None, None, HellsingElectronRepulsionEngine(True))
+
+        # build hydrogen molecule
+        mol = Molecule("H2O")
+        mol.add_atom('O', 0.00000, -0.07579, 0.00000)
+        mol.add_atom('H', 0.86681, 0.60144, 0.00000)
+        mol.add_atom('H',  -0.86681, 0.60144, 0.00000)
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'sto3g.json')
+        cgfs, nuclei = mol.build_basis(fname)
+        
+        N = len(cgfs)
+        fname = os.path.join(os.path.dirname(__file__), 'data', 'repulsion_h2o.txt')
+        vals = np.loadtxt(fname).reshape((N,N,N,N))
+        res = integrator.eri_tensor(cgfs)
+        np.testing.assert_almost_equal(res, vals, 4)
+
 if __name__ == '__main__':
     unittest.main()

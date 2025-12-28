@@ -15,8 +15,8 @@ class HellsingNuclearEngine(NuclearEngine):
             dtype=np.float64
         )
 
-        self.__use_kernel = use_kernel
-        if self.__use_kernel:
+        self._use_kernel = use_kernel
+        if self._use_kernel:
             self._compute_kernel(lmax)
 
     def nuclear_primitive(self, gto1:GTO, gto2:GTO, nucleus):
@@ -28,7 +28,7 @@ class HellsingNuclearEngine(NuclearEngine):
                              nucleus)
 
     def get_kernel_coefficients(self, l1, l2):
-        if self.__use_kernel and l1 <= self._lmax and l2 <= self._lmax:
+        if self._use_kernel and l1 <= self._lmax and l2 <= self._lmax:
             return self._kernel[l1][l2]
         else:
             return None
@@ -56,7 +56,7 @@ class HellsingNuclearEngine(NuclearEngine):
         rab2 = np.sum(np.power(a-b,2))
         rcp2 = np.sum(np.power(c-p,2))
         
-        if self.__use_kernel:
+        if self._use_kernel:
             ax, mx = self._A_array_kernel(o1[0], o2[0], alpha1, alpha2, a[0]-b[0], gamma, p[0] - c[0])
             ay, my = self._A_array_kernel(o1[1], o2[1], alpha1, alpha2, a[1]-b[1], gamma, p[1] - c[1])
             az, mz = self._A_array_kernel(o1[2], o2[2], alpha1, alpha2, a[2]-b[2], gamma, p[2] - c[2])
@@ -142,7 +142,7 @@ class HellsingNuclearEngine(NuclearEngine):
         return np.asarray(arr), terms[-1]
     
     def _compute_kernel(self, lmax=3):
-        self._lmax = 3
+        self._lmax = lmax
         self._kernel = [[None for _ in range(lmax+1)] for _ in range(lmax+1)]
 
         for i in range(lmax+1):

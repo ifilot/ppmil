@@ -3,12 +3,12 @@ import os
 import time
 
 from ppmil import Molecule, GTO
-from ppmil import IntegralEvaluator, HuzinagaElectronRepulsionEngine
+from ppmil import IntegralEvaluator, HellsingElectronRepulsionEngine
 from ppmil.eri.teindex import teindex
 
 def main():
     # construct integrator object
-    integrator = IntegralEvaluator(None, None, HuzinagaElectronRepulsionEngine())
+    integrator = IntegralEvaluator(None, None, HellsingElectronRepulsionEngine())
 
     # build hydrogen molecule
     mol = Molecule('benzene', os.path.join(os.path.dirname(__file__), 'data', 'co.xyz'))
@@ -17,7 +17,7 @@ def main():
     st = time.perf_counter()
     res = integrator.eri_tensor(cgfs, verbose=True)
     end = time.perf_counter()
-    print('Time elapsed (Huzinaga): %.2f s' % (end - st))
+    print('Time elapsed (Hellsing): %.2f s' % (end - st))
 
 if __name__ == '__main__':
     main()

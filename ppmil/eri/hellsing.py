@@ -8,14 +8,21 @@ from ..math.gamma_numba import Fgamma
 
 class HellsingElectronRepulsionEngine(ElectronRepulsionEngine):
 
-    def __init__(self):
+    def __init__(self, use_kernel=False, lmax=1):
         super().__init__()
+
+        self._use_kernel = use_kernel
+        if self._use_kernel:
+            self._compute_kernel(lmax)
 
     def repulsion_primitive(self, gto1:GTO, gto2:GTO, gto3:GTO, gto4:GTO):
         """
         Calculate two-electron integral for four gtos
         """
-        return self._repulsion(gto1, gto2, gto3, gto4)
+        if self._use_kernel:
+            return self._repulsion_kernel(gto1, gto2, gto3, gto4)
+        else:
+            return self._repulsion(gto1, gto2, gto3, gto4)
 
     def _repulsion(self, gto1, gto2, gto3, gto4):
         rab2 = np.sum(np.power(gto1.p - gto2.p,2))
@@ -55,6 +62,66 @@ class HellsingElectronRepulsionEngine(ElectronRepulsionEngine):
                 for k in range(len(b[2])):
                     nu = b[0][i][1] + b[1][j][1] + b[2][k][1] - (b[0][i][2] + b[1][j][2] + b[2][k][2])
                     s += b[0][i][0] * b[1][j][0] * b[2][k][0] * fg[nu]
+
+        return 2.0 * np.power(np.pi, 2.5) / (gamma1 * gamma2 * np.sqrt(gamma1+gamma2)) * \
+               np.exp(-gto1.alpha * gto2.alpha * rab2 / gamma1) * \
+               np.exp(-gto3.alpha * gto4.alpha * rcd2 / gamma2) * s
+    
+    def _repulsion_kernel(self, gto1, gto2, gto3, gto4):
+        rab2 = np.sum(np.power(gto1.p - gto2.p,2))
+        rcd2 = np.sum(np.power(gto3.p - gto4.p,2))
+
+        p = gaussian_product_center(gto1.alpha, gto1.p, gto2.alpha, gto2.p)
+        q = gaussian_product_center(gto3.alpha, gto3.p, gto4.alpha, gto4.p)
+        pq = p - q
+        rpq2 = np.sum(np.power(p-q,2))
+
+        a1 = gto1.alpha
+        a2 = gto2.alpha
+        a3 = gto3.alpha
+        a4 = gto4.alpha
+        gamma1 = a1 + a2
+        gamma2 = a3 + a4
+        eta = gamma1 * gamma2 / (gamma1 + gamma2)
+
+        # grab coefficients from kernel
+        # b[x][0] -> float-constants
+        # b[x][1] -> integers
+        b = []
+        for i in range(0,3):
+            b.append(self._kernel[gto1.o[i]][gto2.o[i]][gto3.o[i]][gto4.o[i]])
+
+        powx = b[0][1][:,0:10]
+        powy = b[1][1][:,0:10]
+        powz = b[2][1][:,0:10]
+
+        coeffx = b[0][1][:,-2:]
+        coeffy = b[1][1][:,-2:]
+        coeffz = b[2][1][:,-2:]
+
+        cx = b[0][0]
+        cy = b[1][0]
+        cz = b[2][0]
+
+        # pre-calculate Fgamma values
+        nu_max = np.sum(gto1.o) + np.sum(gto2.o) + np.sum(gto3.o) + np.sum(gto4.o)
+        fg = np.array([Fgamma(nu, eta * rpq2) for nu in range(nu_max+1)])
+
+        # pre-calculate powers
+        base1 = np.array([a1, a2, a3, a4, gamma1, gamma2, p[0], q[0], eta, pq[0]])
+        polx = cx * np.prod(np.power(base1, powx), axis = 1)
+        base2 = np.array([a1, a2, a3, a4, gamma1, gamma2, p[1], q[1], eta, pq[1]])
+        poly = cy * np.prod(np.power(base2, powy), axis = 1)
+        base3 = np.array([a1, a2, a3, a4, gamma1, gamma2, p[2], q[2], eta, pq[2]])
+        polz = cz * np.prod(np.power(base3, powz), axis = 1)
+
+        # calculate sum
+        s = 0.0
+        for i in range(len(cx)):
+            for j in range(len(cy)):
+                for k in range(len(cz)):
+                    nu = coeffx[i,-2] + coeffy[j,-2] + coeffz[k,-2] - (coeffx[i,-1] + coeffy[j,-1] + coeffz[k,-1])
+                    s += polx[i] * poly[j] * polz[k] * fg[nu]
 
         return 2.0 * np.power(np.pi, 2.5) / (gamma1 * gamma2 * np.sqrt(gamma1+gamma2)) * \
                np.exp(-gto1.alpha * gto2.alpha * rab2 / gamma1) * \
@@ -124,3 +191,116 @@ class HellsingElectronRepulsionEngine(ElectronRepulsionEngine):
                                                     arr.append((pre1 * pre2 * t11 * t12 * t21 * t22 * t3, mu, u))
 
         return arr
+    
+    def _calculate_coefficients(self, l1, l2, l3, l4):
+
+        scalar_terms = []
+        alpha1_terms = []
+        alpha2_terms = []
+        alpha3_terms = []
+        alpha4_terms = []
+
+        gamma1_terms = []
+        gamma2_terms = []
+        
+        x1_terms = []
+        x2_terms = []
+        pqx_terms = []
+        eta_terms = []
+
+        mu_terms = []
+        u_terms = []
+
+        pre1 = np.power(-1, l1+l2) * self._fact[l1] * self._fact[l2]
+        pre2 = self._fact[l3] * self._fact[l4]
+
+        for i1 in range(l1//2+1):
+            for i2 in range(l2//2+1):
+                for o1 in range(l1 - 2*i1 + 1):
+                    for o2 in range(l2 - 2*i2 + 1):
+                        for r1 in range((o1 + o2)//2 + 1):
+                            # constant term (mul)
+                            t11 = np.power(-1, o2+r1) * \
+                                  self._fact[o1 + o2] / \
+                                  np.power(4, i1 + i2 + r1) / \
+                                  self._fact[i1] / \
+                                  self._fact[i2] / \
+                                  self._fact[o1] / \
+                                  self._fact[o2] / \
+                                  self._fact[r1]
+                            
+                            # constant term (div)
+                            t12 = self._fact[l1 - 2*i1 - o1] * \
+                                  self._fact[l2 - 2*i2 - o2] * \
+                                  self._fact[o1 + o2 - 2*r1]
+                            for i3 in range(l3//2+1):
+                                for i4 in range(l4//2+1):
+                                    for o3 in range(l3 - 2*i3 + 1):
+                                        for o4 in range(l4 - 2*i4 + 1):
+                                            for r2 in range((o3 + o4)//2 + 1):
+                                                # constant term (mul)
+                                                t21 = np.power(-1, o3+r2) * \
+                                                      self._fact[o3 + o4] / \
+                                                      np.power(4, i3 + i4 + r2) / \
+                                                      self._fact[i3] / \
+                                                      self._fact[i4] / \
+                                                      self._fact[o3] / \
+                                                      self._fact[o4] / \
+                                                      self._fact[r2]
+                                                
+                                                # constant term (div)
+                                                t22 = self._fact[l3 - 2*i3 - o3] * \
+                                                      self._fact[l4 - 2*i4 - o4] * \
+                                                      self._fact[o3 + o4 - 2*r2]
+                                                mu = l1 + l2 + l3 + l4 - 2 * (i1 + i2 + i3 + i4) - (o1 + o2 + o3 + o4)
+                                                for u in range(mu//2+1):
+                                                    t3 = np.power(-1, u) * \
+                                                         self._fact[mu] / \
+                                                         np.power(4, u) / \
+                                                         self._fact[u] / \
+                                                         self._fact[mu - 2*u]
+                                                    
+                                                    scalar_terms.append(pre1 * pre2 * t11 / t12 * t21 / t22 * t3)
+                                                    alpha1_terms.append(o2-i1-r1)
+                                                    alpha2_terms.append(o1-i2-r1)
+                                                    alpha3_terms.append(o4-i3-r2)
+                                                    alpha4_terms.append(o3-i4-r2)
+
+                                                    gamma1_terms.append(2*(i1+i2) + r1 - (l1+l2))
+                                                    gamma2_terms.append(2*(i3+i4) + r2 - (l3+l4))
+                                                    
+                                                    x1_terms.append(o1 + o2 - 2*r1)
+                                                    x2_terms.append(o3 + o4 - 2*r2)
+                                                    eta_terms.append(mu-u)
+                                                    pqx_terms.append(mu-2*u)
+
+                                                    mu_terms.append(mu)
+                                                    u_terms.append(u)
+
+        # collect all integer-based terms
+        power_terms = np.empty((len(scalar_terms), 12), dtype=np.int8)
+        power_terms[:, 0] = alpha1_terms
+        power_terms[:, 1] = alpha2_terms
+        power_terms[:, 2] = alpha3_terms
+        power_terms[:, 3] = alpha4_terms
+        power_terms[:, 4] = gamma1_terms
+        power_terms[:, 5] = gamma2_terms
+        power_terms[:, 6] = x1_terms
+        power_terms[:, 7] = x2_terms
+        power_terms[:, 8] = eta_terms
+        power_terms[:, 9] = pqx_terms
+        power_terms[:, 10] = mu_terms
+        power_terms[:, 11] = u_terms
+
+        return np.asarray(scalar_terms, dtype=np.float64), power_terms
+    
+    def _compute_kernel(self, lmax):
+        self._lmax = lmax
+        self._kernel = np.empty((lmax+1, lmax+1, lmax+1, lmax+1), dtype=object)
+        self._kernel.fill(None)
+
+        for i in range(lmax+1):
+            for j in range(lmax+1):
+                for k in range(lmax+1):
+                    for l in range(lmax+1):
+                        self._kernel[i][j][k][l] = self._calculate_coefficients(i, j, k, l)
