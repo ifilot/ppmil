@@ -108,11 +108,20 @@ class HellsingElectronRepulsionEngine(ElectronRepulsionEngine):
         fg = np.array([Fgamma(nu, eta * rpq2) for nu in range(nu_max+1)])
 
         # pre-calculate powers
-        base1 = np.array([a1, a2, a3, a4, gamma1, gamma2, p[0], q[0], eta, pq[0]])
+        base1 = np.array([a1, a2, a3, a4, gamma1, gamma2, 
+                          gto1.p[0] - gto2.p[0], # ax - bx
+                          gto3.p[0] - gto4.p[0], # cx - dx
+                          eta, pq[0]])
         polx = cx * np.prod(np.power(base1, powx), axis = 1)
-        base2 = np.array([a1, a2, a3, a4, gamma1, gamma2, p[1], q[1], eta, pq[1]])
+        base2 = np.array([a1, a2, a3, a4, gamma1, gamma2, 
+                          gto1.p[1] - gto2.p[1], # ay - by
+                          gto3.p[1] - gto4.p[1], # ay - by
+                          eta, pq[1]])
         poly = cy * np.prod(np.power(base2, powy), axis = 1)
-        base3 = np.array([a1, a2, a3, a4, gamma1, gamma2, p[2], q[2], eta, pq[2]])
+        base3 = np.array([a1, a2, a3, a4, gamma1, gamma2, 
+                          gto1.p[2] - gto2.p[2], # az - bz
+                          gto3.p[2] - gto4.p[2], # az - bz
+                          eta, pq[2]])
         polz = cz * np.prod(np.power(base3, powz), axis = 1)
 
         # calculate sum

@@ -8,7 +8,7 @@ from ppmil.eri.teindex import teindex
 
 def main():
     # construct integrator object
-    integrator = IntegralEvaluator(None, None, HellsingElectronRepulsionEngine())
+    integrator = IntegralEvaluator(None, None, HellsingElectronRepulsionEngine(True))
 
     # build hydrogen molecule
     mol = Molecule('benzene', os.path.join(os.path.dirname(__file__), 'data', 'co.xyz'))
