@@ -54,7 +54,7 @@ class TestNuclearDeriv(unittest.TestCase):
         Test Derivatives of water
         """
         # build integrator object
-        engine = HuzinagaNuclearEngine()
+        integrator = IntegralEvaluator(None, HellsingNuclearEngine(True), None)
 
         # build hydrogen molecule
         molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
@@ -66,8 +66,8 @@ class TestNuclearDeriv(unittest.TestCase):
         H1pos = nuclei[1][0]
         O = nuclei[0][0]
         Ochg = nuclei[0][1]
-        fx1 = engine.nuclear_deriv(cgfs[2], cgfs[2], O, Ochg, H1pos, 0) # 2px
-        fx2 = engine.nuclear_deriv(cgfs[2], cgfs[3], O, Ochg, H1pos, 0) # 2py
+        fx1 = integrator.nuclear_deriv(cgfs[2], cgfs[2], O, Ochg, H1pos, 0) # 2px
+        fx2 = integrator.nuclear_deriv(cgfs[2], cgfs[3], O, Ochg, H1pos, 0) # 2py
 
         ans1 = calculate_force_finite_difference(molfile, basisfile, 1, 2, 2, 0)
         ans2 = calculate_force_finite_difference(molfile, basisfile, 1, 3, 3, 0)
@@ -79,8 +79,8 @@ class TestNuclearDeriv(unittest.TestCase):
         np.testing.assert_almost_equal(fx2, ans2, 4)
 
         # # assert that the cross-terms will change
-        fx3 = engine.nuclear_deriv(cgfs[2], cgfs[5], O, Ochg, nuclei[1][0], 0) # 2px
-        fx4 = engine.nuclear_deriv(cgfs[2], cgfs[5], O, Ochg, nuclei[1][0], 0) # 2px
+        fx3 = integrator.nuclear_deriv(cgfs[2], cgfs[5], O, Ochg, nuclei[1][0], 0) # 2px
+        fx4 = integrator.nuclear_deriv(cgfs[2], cgfs[5], O, Ochg, nuclei[1][0], 0) # 2px
 
         ans3 = calculate_force_finite_difference(molfile, basisfile, 1, 2, 5, 0)
         ans4 = calculate_force_finite_difference(molfile, basisfile, 1, 2, 5, 0)
@@ -122,7 +122,7 @@ class TestNuclearDeriv(unittest.TestCase):
         Test Derivatives of water
         """
         # build integrator object
-        engine = HuzinagaNuclearEngine()
+        integrator = IntegralEvaluator(None, HellsingNuclearEngine(True), None)
 
         # build water molecule
         molfile = os.path.join(os.path.dirname(__file__), 'data', 'h2o.xyz')
@@ -140,7 +140,7 @@ class TestNuclearDeriv(unittest.TestCase):
             for j in range(0, len(cgfs)): # loop over cgfs
                 for k in range(0,3):  # loop over nuclei
                     for l in range(0,3):  # loop over directions
-                        forces[i,j,k,l] = engine.nuclear_deriv(cgfs[i], cgfs[j], O, Ochg, nuclei[k][0], l)
+                        forces[i,j,k,l] = integrator.nuclear_deriv(cgfs[i], cgfs[j], O, Ochg, nuclei[k][0], l)
         
         np.testing.assert_almost_equal(forces, vals, 4)
 

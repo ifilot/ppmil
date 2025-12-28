@@ -593,6 +593,110 @@ class IntegralEvaluator:
 
     def nuclear_deriv(self, cgf1, cgf2, nuc, charge, nucderiv, coord):
         """
+        Analytic geometric derivative of the nuclear attraction integral, using
+        the SAME displacement semantics as your finite-difference version:
+
+        When differentiating w.r.t. a nuclear coordinate, we translate:
+        - the nucleus itself if nucderiv == nuc
+        - cgf1 center if it sits on nucderiv
+        - cgf2 center if it sits on nucderiv
+
+        The resulting derivative is the sum of the corresponding partial derivatives
+        (A, B, and/or C contributions). If all three (cgf1, cgf2, nuc) coincide with
+        nucderiv (pure translation), derivative is 0.
+        """
+        if not isinstance(cgf1, CGF):
+            raise TypeError("Argument cgf1 must be of CGF type")
+        if not isinstance(cgf2, CGF):
+            raise TypeError("Argument cgf2 must be of CGF type")
+        nuc = np.asarray(nuc, dtype=float)
+        nucderiv = np.asarray(nucderiv, dtype=float)
+        assert nuc.shape == (3,)
+        assert nucderiv.shape == (3,)
+        assert coord in (0, 1, 2)
+
+        # Match your old tolerance scale (you used 1e-3)
+        tol = 1e-3
+        n1 = np.linalg.norm(cgf1.p - nucderiv) < tol
+        n2 = np.linalg.norm(cgf2.p - nucderiv) < tol
+        n3 = np.linalg.norm(nuc - nucderiv) < tol
+
+        # Preserve your "pure translation" early exit behavior:
+        # - all True  => moving cgf1, cgf2, and nucleus together => 0 by invariance
+        # - all False => you're not moving anything relevant => 0
+        if n1 == n2 == n3:
+            return 0.0
+
+        # Helper: evaluate primitive nuclear attraction with modified angular momenta.
+        def prim_with_orders(g1, g2, o1_new, o2_new):
+            return self._nuclear_engine._nuclear(
+                g1.p, np.asarray(o1_new, dtype=int), g1.alpha,
+                g2.p, np.asarray(o2_new, dtype=int), g2.alpha,
+                nuc
+            )
+
+        dval = 0.0
+
+        # ---- Contribution from moving CGF1 center (A) ----
+        if n1:
+            for gto1 in cgf1.gtos:
+                for gto2 in cgf2.gtos:
+                    l = int(gto1.o[coord])
+                    aexp = float(gto1.alpha)
+
+                    o1_up = np.array(gto1.o, dtype=int); o1_up[coord] += 1
+                    v_up = prim_with_orders(gto1, gto2, o1_up, gto2.o)
+
+                    if l > 0:
+                        o1_dn = np.array(gto1.o, dtype=int); o1_dn[coord] -= 1
+                        v_dn = prim_with_orders(gto1, gto2, o1_dn, gto2.o)
+                    else:
+                        v_dn = 0.0
+
+                    # ∂/∂A_coord V = 2*alpha1*V(l+1) - l*V(l-1)
+                    dv = 2.0 * aexp * v_up - float(l) * v_dn
+
+                    pref = gto1.c * gto2.c * gto1.norm * gto2.norm
+                    dval += pref * dv
+
+        # ---- Contribution from moving CGF2 center (B) ----
+        if n2:
+            for gto1 in cgf1.gtos:
+                for gto2 in cgf2.gtos:
+                    l = int(gto2.o[coord])
+                    bexp = float(gto2.alpha)
+
+                    o2_up = np.array(gto2.o, dtype=int); o2_up[coord] += 1
+                    v_up = prim_with_orders(gto1, gto2, gto1.o, o2_up)
+
+                    if l > 0:
+                        o2_dn = np.array(gto2.o, dtype=int); o2_dn[coord] -= 1
+                        v_dn = prim_with_orders(gto1, gto2, gto1.o, o2_dn)
+                    else:
+                        v_dn = 0.0
+
+                    # ∂/∂B_coord V = 2*alpha2*V(l+1) - l*V(l-1)
+                    dv = 2.0 * bexp * v_up - float(l) * v_dn
+
+                    pref = gto1.c * gto2.c * gto1.norm * gto2.norm
+                    dval += pref * dv
+
+        # ---- Contribution from moving the nucleus (C) ----
+        if n3:
+            for gto1 in cgf1.gtos:
+                for gto2 in cgf2.gtos:
+                    grad_c = self._nuclear_engine._nuclear_grad_c(
+                        gto1.p, gto1.o, gto1.alpha,
+                        gto2.p, gto2.o, gto2.alpha,
+                        nuc
+                    )
+                    pref = gto1.c * gto2.c * gto1.norm * gto2.norm
+                    dval += pref * grad_c[coord]
+
+        return float(charge) * dval
+
+    def nuclear_deriv_fd(self, cgf1, cgf2, nuc, charge, nucderiv, coord):
+        """
         Calculate geometric derivative for nuclear integrals
         
         In contrast to the analytical solutions used previously, here
