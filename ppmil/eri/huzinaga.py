@@ -9,11 +9,7 @@ from ..math.gamma_numba import Fgamma
 class HuzinagaElectronRepulsionEngine(ElectronRepulsionEngine):
 
     def __init__(self):
-        # always cache factorials
-        self._fact = np.array(
-            [factorial(i) for i in range(10)],
-            dtype=np.float64
-        )
+        super().__init__()
 
     def repulsion_primitive(self, gto1:GTO, gto2:GTO, gto3:GTO, gto4:GTO):
         """
