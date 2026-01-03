@@ -1,0 +1,1170 @@
+{
+  "conventions": {
+    "basis_type": "cartesian",
+    "normalization": "normalized_contracted",
+    "precision": "double",
+    "units": "bohr"
+  },
+  "description": "STO-3G H2 ERI reference (normalized contracted CGFs)",
+  "tests": [
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        }
+      ],
+      "description": "(1s_A 1s_A | 1s_A 1s_A)",
+      "eri": {
+        "value": 0.7746059439198979
+      },
+      "id": "H2_T1111"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        }
+      ],
+      "description": "(1s_A 1s_A | 1s_B 1s_B)",
+      "eri": {
+        "value": 0.5696759256037444
+      },
+      "id": "H2_T1122"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        }
+      ],
+      "description": "(1s_A 1s_A | 1s_A 1s_B)",
+      "eri": {
+        "value": 0.4441076580319603
+      },
+      "id": "H2_T1112"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        }
+      ],
+      "description": "(1s_B 1s_A | 1s_B 1s_A)",
+      "eri": {
+        "value": 0.2970285402769316
+      },
+      "id": "H2_T2121"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        }
+      ],
+      "description": "(1s_A 1s_B | 1s_B 1s_B)",
+      "eri": {
+        "value": 0.44410765803196034
+      },
+      "id": "H2_T1222"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                1.4
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.15432897,
+              "exponent": 3.42525091
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.53532814,
+              "exponent": 0.62391373
+            },
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 0.44463454,
+              "exponent": 0.1688554
+            }
+          ]
+        }
+      ],
+      "description": "(1s_B 1s_B | 1s_A 1s_A)",
+      "eri": {
+        "value": 0.5696759256037444
+      },
+      "id": "H2_T2211"
+    }
+  ],
+  "version": "1.0"
+}

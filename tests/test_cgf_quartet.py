@@ -9,7 +9,10 @@ from ppmil import IntegralEvaluator, HuzinagaElectronRepulsionEngine, HellsingEl
 class TestRepulsion(unittest.TestCase):
 
     def test_reference_set_00(self):
-        run_eri_reference_tests(os.path.join(os.path.dirname(__file__), 'data', 'eri_testset.json'), 1e-8, 5e-7)
+        run_eri_reference_tests(os.path.join(os.path.dirname(__file__), 'data', 'refsets', '001_base.json'), 1e-8, 5e-7)
+    
+    def test_reference_set_01(self):
+        run_eri_reference_tests(os.path.join(os.path.dirname(__file__), 'data', 'refsets', '002_h2.json'), 1e-8, 5e-7)
 
 def make_gto_from_json(gto_json, normalization_mode):
     """
@@ -25,7 +28,10 @@ def make_gto_from_json(gto_json, normalization_mode):
     if normalization_mode == "raw_primitive":
         # cancel primitive normalization
         gto.c /= gto.norm
-    elif normalization_mode == "normalized_primitive":
+    elif normalization_mode in (
+        "normalized_primitive",
+            "normalized_contracted",
+    ):
         # default behavior: nothing to do
         pass
     else:
