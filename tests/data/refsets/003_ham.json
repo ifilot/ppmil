@@ -1,0 +1,417 @@
+{
+  "conventions": {
+    "basis_type": "cartesian",
+    "normalization": "raw_primitive",
+    "precision": "double",
+    "units": "bohr"
+  },
+  "description": "High angular momentum ERI reference set (raw primitives)",
+  "tests": [
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                1,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                2,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.2,
+                0.8
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                1.1,
+                0.1,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                1.0,
+                0.9,
+                0.7
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        }
+      ],
+      "description": "(p_x d_xx | s s) four-center asymmetric",
+      "eri": {
+        "value": 0.5267403555177204
+      },
+      "id": "HL_PD_SS"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                1,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                2,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.2,
+                0.8
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                1,
+                0
+              ],
+              "center": [
+                1.1,
+                0.1,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                1,
+                1,
+                1
+              ],
+              "center": [
+                1.0,
+                0.9,
+                0.7
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        }
+      ],
+      "description": "(p_x d_xx | p_y f_xyz) four-center asymmetric",
+      "eri": {
+        "value": -0.004680185869478494
+      },
+      "id": "HL_PDPF"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                1,
+                1,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                3,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.2,
+                0.8
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                1
+              ],
+              "center": [
+                1.1,
+                0.1,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                1,
+                0,
+                0
+              ],
+              "center": [
+                1.0,
+                0.9,
+                0.7
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        }
+      ],
+      "description": "(d_xy f_xxx | p_z p_x) four-center asymmetric",
+      "eri": {
+        "value": 0.004112997112799232
+      },
+      "id": "HL_DF_PP"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                1,
+                1,
+                1
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                2,
+                2,
+                0
+              ],
+              "center": [
+                0.0,
+                0.2,
+                0.8
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                1.1,
+                0.1,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                1.0,
+                0.9,
+                0.7
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.7
+            }
+          ]
+        }
+      ],
+      "description": "(f_xyz g_xxyy | s s) four-center asymmetric",
+      "eri": {
+        "value": 0.009763568803213557
+      },
+      "id": "HL_FG_SS"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                4,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.6
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                2,
+                2,
+                0
+              ],
+              "center": [
+                0.0,
+                0.2,
+                0.8
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.6
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                1,
+                1,
+                2
+              ],
+              "center": [
+                1.1,
+                0.1,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.6
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                4
+              ],
+              "center": [
+                1.0,
+                0.9,
+                0.7
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.6
+            }
+          ]
+        }
+      ],
+      "description": "(g_xxxx g_xxyy | g_xyzz g_zzzz) four-center asymmetric",
+      "eri": {
+        "value": -0.04004945041841106
+      },
+      "id": "HL_GG_GG"
+    }
+  ],
+  "version": "1.0"
+}
