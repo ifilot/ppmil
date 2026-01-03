@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import os
 
-from ppmil import Molecule, GTO
+from ppmil import Molecule, GTO, CGF
 from ppmil import IntegralEvaluator, HuzinagaElectronRepulsionEngine, HellsingElectronRepulsionEngine
 from ppmil.eri.teindex import teindex
 
@@ -56,6 +56,58 @@ class TestRepulsion(unittest.TestCase):
         # test similarity between two-electron integrals
         np.testing.assert_almost_equal(T1222, T1112, 4)
         np.testing.assert_almost_equal(T1122, T2211, 4)
+
+    def test_cgf_dataset(self):
+        integrator = IntegralEvaluator(None, None, HuzinagaElectronRepulsionEngine())
+
+        # -------------------------------------------------
+        # TEST 1: same-center s primitive
+        # -------------------------------------------------
+        cgf = cgf_from_gto(raw_s_gto(1.0, [0, 0, 0]))
+
+        np.testing.assert_almost_equal(
+            integrator.repulsion(cgf, cgf, cgf, cgf),
+            4.37335458190621651,
+            7
+        )
+
+        # -------------------------------------------------
+        # TEST 2: two-center s primitive (near)
+        # -------------------------------------------------
+        cgfA = cgf_from_gto(raw_s_gto(1.0, [0, 0, 0]))
+        cgfB = cgf_from_gto(raw_s_gto(1.0, [0, 0, 0.7]))
+
+        np.testing.assert_almost_equal(
+            integrator.repulsion(cgfA, cgfA, cgfB, cgfB),
+            3.75287345542152329,
+            7
+        )
+
+        # -------------------------------------------------
+        # TEST 3: two-center s primitive (far)
+        # -------------------------------------------------
+        cgfA = cgf_from_gto(raw_s_gto(1.0, [0, 0, 0]))
+        cgfB = cgf_from_gto(raw_s_gto(1.0, [0, 0, 2.5]))
+
+        np.testing.assert_almost_equal(
+            integrator.repulsion(cgfA, cgfA, cgfB, cgfB),
+            1.54968293067256613,
+            7
+        )
+
+        # -------------------------------------------------
+        # TEST 4: four-center rectangle
+        # -------------------------------------------------
+        cgfA = cgf_from_gto(raw_s_gto(0.8, [0.0, 0.0, 0.0]))
+        cgfB = cgf_from_gto(raw_s_gto(0.8, [0.0, 0.0, 0.8]))
+        cgfC = cgf_from_gto(raw_s_gto(0.8, [1.1, 0.0, 0.0]))
+        cgfD = cgf_from_gto(raw_s_gto(0.8, [1.1, 0.0, 0.8]))
+
+        np.testing.assert_almost_equal(
+            integrator.repulsion(cgfA, cgfB, cgfC, cgfD),
+            3.44739234923908500,
+            7
+        )
     
     def test_repulsion_h2o(self):
         """
@@ -188,6 +240,19 @@ class TestRepulsion(unittest.TestCase):
         vals = np.loadtxt(fname).reshape((N,N,N,N))
         res = integrator.eri_tensor(cgfs)
         np.testing.assert_almost_equal(res, vals, 4)
+
+#
+# HELPER FUNCTIONS
+#
+def raw_s_gto(alpha, center):
+    gto = GTO(1.0, alpha, center, [0, 0, 0])
+    gto.c /= gto.norm    # cancel primitive normalization
+    return gto
+
+def cgf_from_gto(gto):
+    cgf = CGF()
+    cgf.gtos.append(gto)
+    return cgf
 
 if __name__ == '__main__':
     unittest.main()

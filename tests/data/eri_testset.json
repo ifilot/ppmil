@@ -1,0 +1,336 @@
+{
+  "conventions": {
+    "basis_type": "cartesian",
+    "normalization": "raw_primitive",
+    "precision": "double",
+    "units": "bohr"
+  },
+  "description": "Reference ERI dataset (raw primitive CGFs)",
+  "tests": [
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        }
+      ],
+      "description": "Same-center s primitive",
+      "eri": {
+        "value": 4.3733545819062165
+      },
+      "id": "S_SAME"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.7
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.7
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        }
+      ],
+      "description": "Two-center s primitive (R = 0.7)",
+      "eri": {
+        "value": 3.7528734554215233
+      },
+      "id": "S_TWO_NEAR"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                2.5
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                2.5
+              ],
+              "coefficient": 1.0,
+              "exponent": 1.0
+            }
+          ]
+        }
+      ],
+      "description": "Two-center s primitive (R = 2.5)",
+      "eri": {
+        "value": 1.5496829306725661
+      },
+      "id": "S_TWO_FAR"
+    },
+    {
+      "cgfs": [
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.8
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                0.0,
+                0.0,
+                0.8
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.8
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                1.1,
+                0.0,
+                0.0
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.8
+            }
+          ]
+        },
+        {
+          "gtos": [
+            {
+              "angular_momentum": [
+                0,
+                0,
+                0
+              ],
+              "center": [
+                1.1,
+                0.0,
+                0.8
+              ],
+              "coefficient": 1.0,
+              "exponent": 0.8
+            }
+          ]
+        }
+      ],
+      "description": "Four-center rectangle, alpha = 0.8",
+      "eri": {
+        "value": 3.447392349239085
+      },
+      "id": "S_RECT"
+    }
+  ],
+  "version": "1.0"
+}
